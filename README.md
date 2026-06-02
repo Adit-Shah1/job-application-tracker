@@ -215,7 +215,7 @@ All entity ownership is enforced at the action layer — no application, note, o
 
 ## AI follow-up email
 
-- Uses `gemini-2.5-flash` for cost and speed. Free tier: 15 RPM, 1M TPM.
+- Uses `gemini-3.1-flash-lite` for cost and speed. Free tier: 15 RPM, 1M TPM.
 - The prompt includes the company, role, status, date applied, and the 5 most recent notes.
 - Tone selector: `professional` (default) or `friendly`.
 - Response is streamed to the client and rendered token-by-token.

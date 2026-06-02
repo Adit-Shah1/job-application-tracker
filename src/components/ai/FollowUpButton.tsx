@@ -411,12 +411,9 @@ function FollowUpModal({
           <Button
             type="button"
             variant="ghost"
-            onClick={() => {
-              setEditing(false);
-              if (!activeDraftId) setText("");
-            }}
+            onClick={() => setEditing(false)}
           >
-            <X size={14} /> Done editing
+            <X size={14} /> Done
           </Button>
         )}
         <form action={saveAction} className="contents">

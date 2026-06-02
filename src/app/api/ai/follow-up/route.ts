@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   }
 
   const model = genai.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.1-flash-lite",
     systemInstruction:
       "You are a concise, thoughtful assistant that drafts follow-up emails for job applications. " +
       "Use a clear subject line on the first line prefixed with 'Subject: '. " +
