@@ -18,7 +18,7 @@ import type { ActionResult } from "@/lib/actions/applications";
 import { friendlyDate, isOverdue, fromNow } from "@/lib/dates";
 import { useToast } from "@/components/ui/toast";
 import { Bell, Check, Plus, Trash2 } from "lucide-react";
-import type { Reminder, ReminderType } from "@/generated/prisma";
+import type { Reminder, ReminderType } from "@/generated/prisma/client";
 
 export function RemindersList({
   applicationId,

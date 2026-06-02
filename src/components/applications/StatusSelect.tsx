@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Select } from "@/components/ui/select";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "@/lib/constants";
 import { updateApplicationStatus } from "@/lib/actions/applications";
-import type { ApplicationStatus } from "@/generated/prisma";
+import type { ApplicationStatus } from "@/generated/prisma/client";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 

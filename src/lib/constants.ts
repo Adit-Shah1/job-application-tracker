@@ -2,7 +2,7 @@ import {
   ApplicationStatus,
   Priority,
   ReminderType,
-} from "@/generated/prisma";
+} from "@/generated/prisma/client";
 
 export type { ApplicationStatus, Priority, ReminderType };
 

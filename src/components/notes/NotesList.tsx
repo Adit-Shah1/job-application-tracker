@@ -8,7 +8,7 @@ import type { ActionResult } from "@/lib/actions/applications";
 import { fromNow } from "@/lib/dates";
 import { Trash2, Save, Pencil, X } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
-import type { Note } from "@/generated/prisma";
+import type { Note } from "@/generated/prisma/client";
 
 export function NotesList({
   applicationId,

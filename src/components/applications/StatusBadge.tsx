@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { STATUS_BADGE_VARIANT, STATUS_LABELS } from "@/lib/constants";
-import type { ApplicationStatus } from "@/generated/prisma";
+import type { ApplicationStatus } from "@/generated/prisma/client";
 
 export function StatusBadge({
   status,

@@ -18,7 +18,7 @@ import {
   updateApplication,
   type ActionResult,
 } from "@/lib/actions/applications";
-import type { Application, ApplicationStatus, Priority } from "@/generated/prisma";
+import type { Application, ApplicationStatus, Priority } from "@/generated/prisma/client";
 import { useToast } from "@/components/ui/toast";
 
 type Mode = "create" | "edit";

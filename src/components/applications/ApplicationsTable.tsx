@@ -14,7 +14,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { formatDateShort } from "@/lib/dates";
 import { PRIORITY_LABELS } from "@/lib/constants";
 import { Briefcase, MapPin, Calendar, Plus, FileText, Bell } from "lucide-react";
-import type { ApplicationStatus, Priority } from "@/generated/prisma";
+import type { ApplicationStatus, Priority } from "@/generated/prisma/client";
 
 type ApplicationRow = {
   id: string;

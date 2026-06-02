@@ -8,7 +8,7 @@ import {
   applicationCreateSchema,
   applicationUpdateSchema,
 } from "@/lib/validation";
-import type { Prisma } from "@/generated/prisma";
+import type { Prisma } from "@/generated/prisma/client";
 
 export type ActionResult =
   | { ok: true; id?: string }
