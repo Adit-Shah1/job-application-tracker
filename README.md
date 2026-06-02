@@ -12,7 +12,7 @@ A full-stack web app to track job applications from first save to final outcome.
   <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-Neon-336791?logo=postgresql" />
   <img alt="Auth.js" src="https://img.shields.io/badge/Auth.js-v5-000?logo=auth0" />
   <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind-4-38bdf8?logo=tailwindcss" />
-  <img alt="Gemini" src="https://img.shields.io/badge/Gemini-2.0_Flash-4285f4?logo=google" />
+  <img alt="Gemini" src="https://img.shields.io/badge/Gemini-2.5_Flash-4285f4?logo=google" />
   <img alt="Deployed on Vercel" src="https://img.shields.io/badge/Vercel-deployed-000?logo=vercel" />
 </p>
 
@@ -27,7 +27,7 @@ A full-stack web app to track job applications from first save to final outcome.
 - **Reminders** — Follow-up / Interview / Deadline / Other, with completion tracking and overdue highlighting
 - **Dashboard** — 4 stat cards, status distribution chart (Recharts), upcoming reminders, recently updated activity
 - **Search & filter** — full-text search across company/role/location, status and priority filters, multiple sort options
-- **AI follow-up email** — drafts a personalized follow-up with Google Gemini 2.0 Flash (free tier), with tone selector and token-by-token streaming
+- **AI follow-up email** — drafts a personalized follow-up with Google Gemini 2.5 Flash (free tier), with tone selector and token-by-token streaming
 - **Responsive** — table view on desktop, card view on mobile
 - **Loading states** — shimmer skeletons for slow queries
 - **Animations** — page fade-up, staggered list items, smooth status transitions, dialog scale-in, toast slide-in
@@ -136,7 +136,7 @@ The most common "sign-in doesn't work" issue is a missing or misconfigured OAuth
 | Validation | [Zod](https://zod.dev/) |
 | Forms | React Server Actions + `useActionState` |
 | Charts | [Recharts](https://recharts.org/) |
-| AI | [Google Gemini 2.0 Flash](https://aistudio.google.com/) (free tier) via `@google/generative-ai` |
+| AI | [Google Gemini 2.5 Flash](https://aistudio.google.com/) (free tier) via `@google/generative-ai` |
 | Icons | [Lucide](https://lucide.dev/) |
 | Deployment | [Vercel](https://vercel.com/) + Neon |
 
@@ -215,7 +215,7 @@ All entity ownership is enforced at the action layer — no application, note, o
 
 ## AI follow-up email
 
-- Uses `gemini-2.0-flash` for cost and speed. Free tier: 15 RPM, 1M TPM.
+- Uses `gemini-2.5-flash` for cost and speed. Free tier: 15 RPM, 1M TPM.
 - The prompt includes the company, role, status, date applied, and the 5 most recent notes.
 - Tone selector: `professional` (default) or `friendly`.
 - Response is streamed to the client and rendered token-by-token.

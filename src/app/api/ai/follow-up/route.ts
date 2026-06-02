@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   }
 
   const model = genai.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     systemInstruction:
       "You are a concise, thoughtful assistant that drafts follow-up emails for job applications. " +
       "Use a clear subject line on the first line prefixed with 'Subject: '. " +
@@ -109,9 +109,12 @@ Email:`;
       headers: { "content-type": "text/plain; charset=utf-8" },
     });
   } catch (err) {
-    console.error("Gemini error:", err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[/api/ai/follow-up] Gemini error:", message);
     return new Response(
-      JSON.stringify({ error: "AI generation failed. Please try again." }),
+      JSON.stringify({
+        error: `AI generation failed: ${message}`,
+      }),
       { status: 500, headers: { "content-type": "application/json" } }
     );
   }
