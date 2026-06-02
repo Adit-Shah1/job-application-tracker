@@ -13,7 +13,10 @@ A full-stack web app to track job applications from first save to final outcome.
   <img alt="Auth.js" src="https://img.shields.io/badge/Auth.js-v5-000?logo=auth0" />
   <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind-4-38bdf8?logo=tailwindcss" />
   <img alt="Gemini" src="https://img.shields.io/badge/Gemini-2.0_Flash-4285f4?logo=google" />
+  <img alt="Deployed on Vercel" src="https://img.shields.io/badge/Vercel-deployed-000?logo=vercel" />
 </p>
+
+**[Try the live demo →](https://job-application-tracker-one-ochre.vercel.app/)** &nbsp;·&nbsp; Sign in with GitHub or Google to see the full flow.
 
 ## Features
 
