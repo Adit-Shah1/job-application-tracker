@@ -99,6 +99,7 @@ model Application {
   source       String?
   notes        Note[]
   reminders    Reminder[]
+  emailDrafts  EmailDraft[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -137,4 +138,16 @@ model ResumeVersion {
   fileUrl   String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailDraft {
+  id            String      @id @default(cuid())
+  applicationId String
+  tone          String
+  content       String      @db.Text
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, updatedAt])
 }

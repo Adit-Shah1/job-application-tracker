@@ -9,8 +9,8 @@ import { RemindersList } from "@/components/reminders/RemindersList";
 import { DeleteApplicationButton } from "@/components/applications/DeleteApplicationButton";
 import { FollowUpButton } from "@/components/ai/FollowUpButton";
 import { Badge } from "@/components/ui/badge";
-import { formatDate, formatDateShort } from "@/lib/dates";
-import { PRIORITY_LABELS, REMINDER_TYPE_LABELS } from "@/lib/constants";
+import { formatDate } from "@/lib/dates";
+import { PRIORITY_LABELS } from "@/lib/constants";
 import { ArrowLeft, ExternalLink, Pencil, MapPin, Briefcase, Calendar, DollarSign, Link2, Tag } from "lucide-react";
 
 export default async function ApplicationDetailPage({
@@ -141,50 +141,18 @@ export default async function ApplicationDetailPage({
                 applicationId={app.id}
                 companyName={app.companyName}
                 roleTitle={app.roleTitle}
+                savedDrafts={app.emailDrafts.map((d) => ({
+                  id: d.id,
+                  content: d.content,
+                  tone: d.tone,
+                  updatedAt: d.updatedAt,
+                }))}
               />
             </CardHeader>
             <CardContent>
               <NotesList applicationId={app.id} notes={app.notes} />
             </CardContent>
           </Card>
-
-          {app.reminders.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Reminder history</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-1.5 text-sm">
-                  {app.reminders
-                    .slice()
-                    .sort(
-                      (a, b) =>
-                        b.reminderDate.getTime() - a.reminderDate.getTime()
-                    )
-                    .map((r) => (
-                      <li
-                        key={r.id}
-                        className="flex items-center justify-between border-b border-zinc-100 pb-1.5 last:border-b-0 dark:border-zinc-900"
-                      >
-                        <span>
-                          {REMINDER_TYPE_LABELS[r.reminderType]} ·{" "}
-                          {formatDateShort(r.reminderDate)}
-                        </span>
-                        <span
-                          className={
-                            r.completed
-                              ? "text-emerald-600"
-                              : "text-zinc-500"
-                          }
-                        >
-                          {r.completed ? "Done" : "Pending"}
-                        </span>
-                      </li>
-                    ))}
-                </ul>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
     </div>

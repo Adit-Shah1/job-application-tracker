@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { reminderSchema } from "@/lib/validation";
@@ -47,6 +47,8 @@ export async function createReminder(
   });
   revalidatePath(`/applications/${applicationId}`);
   revalidatePath("/dashboard");
+  updateTag("dashboard");
+  updateTag("applications");
   return { ok: true, id: reminder.id };
 }
 
@@ -65,6 +67,8 @@ export async function completeReminder(reminderId: string): Promise<ActionResult
   });
   revalidatePath(`/applications/${reminder.application.id}`);
   revalidatePath("/dashboard");
+  updateTag("dashboard");
+  updateTag("applications");
   return { ok: true };
 }
 
@@ -80,5 +84,7 @@ export async function deleteReminder(reminderId: string): Promise<ActionResult> 
   await prisma.reminder.delete({ where: { id: reminderId } });
   revalidatePath(`/applications/${reminder.application.id}`);
   revalidatePath("/dashboard");
+  updateTag("dashboard");
+  updateTag("applications");
   return { ok: true };
 }

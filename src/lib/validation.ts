@@ -59,7 +59,13 @@ export const reminderSchema = z.object({
   applicationId: z.string().min(1),
 });
 
+export const emailDraftSchema = z.object({
+  content: z.string().min(1, "Draft cannot be empty").max(10000),
+  tone: z.enum(["professional", "friendly"]),
+});
+
 export type ApplicationCreateInput = z.infer<typeof applicationCreateSchema>;
 export type ApplicationUpdateInput = z.infer<typeof applicationUpdateSchema>;
 export type NoteInput = z.infer<typeof noteSchema>;
 export type ReminderInput = z.infer<typeof reminderSchema>;
+export type EmailDraftInput = z.infer<typeof emailDraftSchema>;

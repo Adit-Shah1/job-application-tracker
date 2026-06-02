@@ -27,7 +27,7 @@ export default async function AppLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <header
-        className="sticky top-0 z-30 border-b border-zinc-200/60 bg-white/70 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/70"
+        className="sticky top-0 z-30 border-b border-zinc-200 bg-white shadow-[0_1px_0_0_rgba(0,0,0,0.02)] dark:border-zinc-800 dark:bg-zinc-950"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-6">
@@ -72,23 +72,25 @@ export default async function AppLayout({
             </NavLink>
           </nav>
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
-            {session.user.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={session.user.image}
-                alt={session.user.name ?? "User avatar"}
-                className="h-7 w-7 rounded-full ring-1 ring-zinc-200 dark:ring-zinc-800"
-              />
-            ) : (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-200 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                {(session.user.name ?? session.user.email ?? "?")
-                  .charAt(0)
-                  .toUpperCase()}
-              </div>
-            )}
-            <span className="hidden text-sm text-zinc-600 sm:inline dark:text-zinc-400">
-              {session.user.name ?? session.user.email}
-            </span>
+            <div className="hidden items-center gap-3 sm:flex">
+              {session.user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={session.user.image}
+                  alt={session.user.name ?? "User avatar"}
+                  className="h-7 w-7 rounded-full ring-1 ring-zinc-200 dark:ring-zinc-800"
+                />
+              ) : (
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-200 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                  {(session.user.name ?? session.user.email ?? "?")
+                    .charAt(0)
+                    .toUpperCase()}
+                </div>
+              )}
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                {session.user.name ?? session.user.email}
+              </span>
+            </div>
             <form action={handleSignOut} className="hidden sm:block">
               <Button
                 type="submit"
@@ -98,16 +100,6 @@ export default async function AppLayout({
               >
                 <LogOut size={15} />
                 <span>Sign out</span>
-              </Button>
-            </form>
-            <form action={handleSignOut} className="sm:hidden">
-              <Button
-                type="submit"
-                variant="ghost"
-                size="icon"
-                aria-label="Sign out"
-              >
-                <LogOut size={16} />
               </Button>
             </form>
           </div>

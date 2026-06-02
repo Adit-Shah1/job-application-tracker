@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { noteSchema } from "@/lib/validation";
@@ -43,6 +43,7 @@ export async function createNote(
     },
   });
   revalidatePath(`/applications/${applicationId}`);
+  updateTag("applications");
   return { ok: true, id: note.id };
 }
 
@@ -74,6 +75,7 @@ export async function updateNote(
     data: { content: parsed.data.content },
   });
   revalidatePath(`/applications/${note.application.id}`);
+  updateTag("applications");
   return { ok: true };
 }
 
@@ -88,5 +90,6 @@ export async function deleteNote(noteId: string): Promise<ActionResult> {
   }
   await prisma.note.delete({ where: { id: noteId } });
   revalidatePath(`/applications/${note.application.id}`);
+  updateTag("applications");
   return { ok: true };
 }

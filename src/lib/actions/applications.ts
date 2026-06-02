@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
@@ -47,6 +47,8 @@ export async function createApplication(
   });
   revalidatePath("/dashboard");
   revalidatePath("/applications");
+  updateTag("dashboard");
+  updateTag("applications");
   return { ok: true, id: app.id };
 }
 
@@ -89,6 +91,8 @@ export async function updateApplication(
   revalidatePath("/dashboard");
   revalidatePath("/applications");
   revalidatePath(`/applications/${id}`);
+  updateTag("dashboard");
+  updateTag("applications");
   return { ok: true };
 }
 
@@ -125,6 +129,8 @@ export async function updateApplicationStatus(
   revalidatePath("/dashboard");
   revalidatePath("/applications");
   revalidatePath(`/applications/${id}`);
+  updateTag("dashboard");
+  updateTag("applications");
   return { ok: true };
 }
 
@@ -137,6 +143,8 @@ export async function deleteApplication(id: string): Promise<ActionResult> {
   await prisma.application.delete({ where: { id } });
   revalidatePath("/dashboard");
   revalidatePath("/applications");
+  updateTag("dashboard");
+  updateTag("applications");
   redirect("/applications");
 }
 

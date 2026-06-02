@@ -102,7 +102,7 @@ export function MobileNav({
               </button>
             </div>
 
-            <nav className="flex-1 space-y-0.5 p-3">
+            <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
               {items.map((item) => {
                 const active = item.exact
                   ? pathname === item.href
@@ -126,17 +126,17 @@ export function MobileNav({
               })}
             </nav>
 
-            <div className="border-t border-zinc-200/80 p-3 dark:border-zinc-800">
-              <div className="mb-2 flex items-center gap-2.5 px-2 py-1.5">
+            <div className="mt-auto border-t border-zinc-200/80 bg-zinc-50/80 p-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/60">
+              <div className="mb-2 flex items-center gap-2.5 rounded-md bg-white px-2.5 py-2 ring-1 ring-zinc-200/80 dark:bg-zinc-950 dark:ring-zinc-800">
                 {userImage ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={userImage}
                     alt=""
-                    className="h-8 w-8 rounded-full ring-1 ring-zinc-200 dark:ring-zinc-800"
+                    className="h-9 w-9 shrink-0 rounded-full ring-1 ring-zinc-200 dark:ring-zinc-800"
                   />
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-200 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 text-sm font-medium text-zinc-50 dark:from-zinc-200 dark:to-zinc-400 dark:text-zinc-900">
                     {(userName ?? userEmail ?? "?").charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -152,9 +152,9 @@ export function MobileNav({
               <form action={signOutAction}>
                 <button
                   type="submit"
-                  className="flex min-h-[44px] w-full items-center gap-3 rounded-md px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  className="flex min-h-[44px] w-full items-center gap-3 rounded-md border border-zinc-200/80 bg-white px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 active:scale-[0.99] dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
                 >
-                  <LogOut size={17} className="text-zinc-500" />
+                  <LogOut size={16} className="text-zinc-500" />
                   Sign out
                 </button>
               </form>

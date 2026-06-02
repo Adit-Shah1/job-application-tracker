@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { startOfDay, addDays } from "date-fns";
@@ -27,18 +28,17 @@ export type DashboardSummary = {
   }>;
 };
 
-export async function getDashboardSummary(): Promise<DashboardSummary> {
-  const user = await requireUser();
+async function loadDashboardSummary(userId: string): Promise<DashboardSummary> {
   const [all, byStatusRaw, upcoming, recent] = await Promise.all([
-    prisma.application.count({ where: { userId: user.id } }),
+    prisma.application.count({ where: { userId } }),
     prisma.application.groupBy({
       by: ["status"],
-      where: { userId: user.id },
+      where: { userId },
       _count: { _all: true },
     }),
     prisma.reminder.findMany({
       where: {
-        application: { userId: user.id },
+        application: { userId },
         completed: false,
         reminderDate: { lte: addDays(new Date(), 14) },
       },
@@ -51,7 +51,7 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
       },
     }),
     prisma.application.findMany({
-      where: { userId: user.id },
+      where: { userId },
       orderBy: { lastUpdated: "desc" },
       take: 5,
       select: {
@@ -92,19 +92,39 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
   };
 }
 
-export async function getApplicationDetail(id: string) {
+const cachedDashboard = unstable_cache(
+  async (userId: string) => loadDashboardSummary(userId),
+  ["dashboard-summary"],
+  { revalidate: 30, tags: ["dashboard"] }
+);
+
+export async function getDashboardSummary(): Promise<DashboardSummary> {
   const user = await requireUser();
+  return cachedDashboard(user.id);
+}
+
+async function loadApplicationDetail(userId: string, id: string) {
   const app = await prisma.application.findUnique({
     where: { id },
     include: {
       notes: { orderBy: { createdAt: "desc" } },
       reminders: { orderBy: { reminderDate: "asc" } },
+      emailDrafts: { orderBy: { updatedAt: "desc" } },
     },
   });
-  if (!app || app.userId !== user.id) {
-    return null;
-  }
+  if (!app || app.userId !== userId) return null;
   return app;
+}
+
+const cachedApplicationDetail = unstable_cache(
+  async (userId: string, id: string) => loadApplicationDetail(userId, id),
+  ["application-detail"],
+  { revalidate: 30, tags: ["applications", "email-drafts"] }
+);
+
+export async function getApplicationDetail(id: string) {
+  const user = await requireUser();
+  return cachedApplicationDetail(user.id, id);
 }
 
 export async function getOverdueRemindersCount(): Promise<number> {
