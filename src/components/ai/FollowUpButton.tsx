@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import {
@@ -18,15 +18,12 @@ export function FollowUpButton({
   applicationId,
   companyName,
   roleTitle,
-  hasGeminiKey,
 }: {
   applicationId: string;
   companyName: string;
   roleTitle: string;
-  hasGeminiKey: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  if (!hasGeminiKey) return null;
   return (
     <>
       <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
@@ -63,8 +60,12 @@ function FollowUpModal({
   const [tone, setTone] = useState<"professional" | "friendly">("professional");
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const abortRef = useRef<AbortController | null>(null);
 
   async function generate() {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     setText("");
     setError(null);
     setLoading(true);
@@ -73,6 +74,7 @@ function FollowUpModal({
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ applicationId, tone }),
+        signal: controller.signal,
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
@@ -84,14 +86,23 @@ function FollowUpModal({
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
+        if (controller.signal.aborted) break;
         setText((prev) => prev + decoder.decode(value, { stream: true }));
       }
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    generate();
+    return () => abortRef.current?.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tone]);
 
   async function copyToClipboard() {
     try {

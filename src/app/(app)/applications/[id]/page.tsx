@@ -141,7 +141,6 @@ export default async function ApplicationDetailPage({
                 applicationId={app.id}
                 companyName={app.companyName}
                 roleTitle={app.roleTitle}
-                hasGeminiKey={!!process.env.GEMINI_API_KEY}
               />
             </CardHeader>
             <CardContent>
