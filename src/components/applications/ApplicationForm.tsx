@@ -181,11 +181,11 @@ export function ApplicationForm({
         </Field>
       </div>
 
-      <div className="flex items-center justify-end gap-2">
-        <ButtonLink href="/applications" variant="outline">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <ButtonLink href="/applications" variant="outline" className="w-full sm:w-auto">
           Cancel
         </ButtonLink>
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" disabled={pending} className="w-full sm:w-auto">
           {pending
             ? mode === "create"
               ? "Creating…"

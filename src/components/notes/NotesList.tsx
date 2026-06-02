@@ -130,7 +130,7 @@ function NoteItem({ note }: { note: Note }) {
     <li className="group rounded-lg border border-zinc-200/80 bg-white/80 p-3 transition-all duration-150 hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-950/80 dark:hover:border-zinc-700">
       <div className="flex items-start justify-between gap-2">
         <p className="whitespace-pre-wrap text-sm">{note.content}</p>
-        <div className="flex shrink-0 gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+        <div className="flex shrink-0 gap-1 opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-hover:opacity-100">
           <Button
             variant="ghost"
             size="icon"

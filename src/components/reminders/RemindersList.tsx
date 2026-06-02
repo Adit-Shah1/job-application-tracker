@@ -186,7 +186,7 @@ function ReminderItem({ reminder }: { reminder: Reminder }) {
           </div>
         </div>
       </div>
-      <div className="flex shrink-0 gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+      <div className="flex shrink-0 gap-1 opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-hover:opacity-100">
         {!reminder.completed && (
           <Button
             variant="ghost"

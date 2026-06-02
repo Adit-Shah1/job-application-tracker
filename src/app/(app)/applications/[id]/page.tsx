@@ -36,11 +36,11 @@ export default async function ApplicationDetailPage({
           <ArrowLeft size={14} /> Back to applications
         </ButtonLink>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-semibold tracking-tight break-words">
               {app.companyName}
             </h1>
-            <p className="text-zinc-600 dark:text-zinc-400">{app.roleTitle}</p>
+            <p className="break-words text-zinc-600 dark:text-zinc-400">{app.roleTitle}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <StatusSelect applicationId={app.id} status={app.status} className="w-auto" />
               <StatusBadge status={app.status} />
@@ -57,7 +57,7 @@ export default async function ApplicationDetailPage({
               </Badge>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:flex-shrink-0">
             <ButtonLink href={`/applications/${app.id}/edit`} variant="outline" size="sm">
               <Pencil size={14} /> Edit
             </ButtonLink>

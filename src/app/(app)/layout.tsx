@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/ui/nav-link";
+import { MobileNav } from "@/components/ui/mobile-nav";
 import {
   LayoutDashboard,
   Briefcase,
@@ -25,8 +26,17 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-30 border-b border-zinc-200/60 bg-white/70 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/70">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
+      <header
+        className="sticky top-0 z-30 border-b border-zinc-200/60 bg-white/70 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/70"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-6">
+          <MobileNav
+            userName={session.user.name ?? null}
+            userEmail={session.user.email ?? null}
+            userImage={session.user.image ?? null}
+            signOutAction={handleSignOut}
+          />
           <Link
             href="/dashboard"
             className="group flex items-center gap-2 font-semibold tracking-tight transition-opacity hover:opacity-80"
@@ -50,7 +60,7 @@ export default async function AppLayout({
             </span>
             <span className="hidden sm:inline">Job Tracker</span>
           </Link>
-          <nav className="flex items-center gap-1 text-sm">
+          <nav className="hidden items-center gap-1 text-sm sm:flex">
             <NavLink href="/dashboard" icon={<LayoutDashboard size={15} />}>
               Dashboard
             </NavLink>
@@ -61,7 +71,7 @@ export default async function AppLayout({
               Settings
             </NavLink>
           </nav>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
             {session.user.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -79,7 +89,7 @@ export default async function AppLayout({
             <span className="hidden text-sm text-zinc-600 sm:inline dark:text-zinc-400">
               {session.user.name ?? session.user.email}
             </span>
-            <form action={handleSignOut}>
+            <form action={handleSignOut} className="hidden sm:block">
               <Button
                 type="submit"
                 variant="ghost"
@@ -87,13 +97,26 @@ export default async function AppLayout({
                 aria-label="Sign out"
               >
                 <LogOut size={15} />
-                <span className="hidden sm:inline">Sign out</span>
+                <span>Sign out</span>
+              </Button>
+            </form>
+            <form action={handleSignOut} className="sm:hidden">
+              <Button
+                type="submit"
+                variant="ghost"
+                size="icon"
+                aria-label="Sign out"
+              >
+                <LogOut size={16} />
               </Button>
             </form>
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main
+        className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 1.5rem)" }}
+      >
         {children}
       </main>
     </div>
