@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
@@ -155,37 +156,39 @@ export type ApplicationFilters = {
   sort?: "recent" | "oldest" | "company" | "status";
 };
 
-export async function listApplications(filters: ApplicationFilters = {}) {
-  const user = await requireUser();
-  const where: Prisma.ApplicationWhereInput = { userId: user.id };
-  if (filters.status && filters.status !== "ALL") {
-    where.status = filters.status as Prisma.EnumApplicationStatusFilter["equals"];
-  }
-  if (filters.priority && filters.priority !== "ALL") {
-    where.priority = filters.priority as Prisma.EnumPriorityFilter["equals"];
-  }
-  if (filters.search && filters.search.trim()) {
-    const q = filters.search.trim();
-    where.OR = [
-      { companyName: { contains: q, mode: "insensitive" } },
-      { roleTitle: { contains: q, mode: "insensitive" } },
-      { location: { contains: q, mode: "insensitive" } },
-    ];
-  }
-  const orderBy: Prisma.ApplicationOrderByWithRelationInput =
-    filters.sort === "oldest"
-      ? { dateSaved: "asc" }
-      : filters.sort === "company"
-        ? { companyName: "asc" }
-        : filters.sort === "status"
-          ? { status: "asc" }
-          : { lastUpdated: "desc" };
+export const listApplications = cache(
+  async (filters: ApplicationFilters = {}) => {
+    const user = await requireUser();
+    const where: Prisma.ApplicationWhereInput = { userId: user.id };
+    if (filters.status && filters.status !== "ALL") {
+      where.status = filters.status as Prisma.EnumApplicationStatusFilter["equals"];
+    }
+    if (filters.priority && filters.priority !== "ALL") {
+      where.priority = filters.priority as Prisma.EnumPriorityFilter["equals"];
+    }
+    if (filters.search && filters.search.trim()) {
+      const q = filters.search.trim();
+      where.OR = [
+        { companyName: { contains: q, mode: "insensitive" } },
+        { roleTitle: { contains: q, mode: "insensitive" } },
+        { location: { contains: q, mode: "insensitive" } },
+      ];
+    }
+    const orderBy: Prisma.ApplicationOrderByWithRelationInput =
+      filters.sort === "oldest"
+        ? { dateSaved: "asc" }
+        : filters.sort === "company"
+          ? { companyName: "asc" }
+          : filters.sort === "status"
+            ? { status: "asc" }
+            : { lastUpdated: "desc" };
 
-  return prisma.application.findMany({
-    where,
-    orderBy,
-    include: {
-      _count: { select: { notes: true, reminders: true } },
-    },
-  });
-}
+    return prisma.application.findMany({
+      where,
+      orderBy,
+      include: {
+        _count: { select: { notes: true, reminders: true } },
+      },
+    });
+  }
+);

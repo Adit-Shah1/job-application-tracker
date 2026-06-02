@@ -1,7 +1,13 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import {
@@ -12,10 +18,22 @@ import {
 } from "@/lib/constants";
 import { Search } from "lucide-react";
 
+const SEARCH_DEBOUNCE_MS = 250;
+
 export function ApplicationsFilterBar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") ?? ""
+  );
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const update = useCallback(
     (key: string, value: string) => {
@@ -30,6 +48,16 @@ export function ApplicationsFilterBar() {
     [pathname, router, searchParams]
   );
 
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    setSearchValue(v);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(
+      () => update("search", v),
+      SEARCH_DEBOUNCE_MS
+    );
+  };
+
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
@@ -41,8 +69,8 @@ export function ApplicationsFilterBar() {
         <Input
           type="search"
           placeholder="Search company, role, location…"
-          defaultValue={searchParams.get("search") ?? ""}
-          onChange={(e) => update("search", e.target.value)}
+          value={searchValue}
+          onChange={handleSearchChange}
           className="pl-8"
         />
       </div>
