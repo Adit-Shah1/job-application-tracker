@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 interface DialogContextValue {
@@ -46,8 +47,14 @@ function DialogContent({
   className?: string;
 }) {
   const { open, setOpen } = useDialog();
+  React.useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }
+  }, [open]);
   if (!open) return null;
-  return (
+  const dialog = (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:items-center"
       role="dialog"
@@ -68,6 +75,8 @@ function DialogContent({
       </div>
     </div>
   );
+  if (typeof document === "undefined") return null;
+  return createPortal(dialog, document.body);
 }
 
 function DialogHeader({
