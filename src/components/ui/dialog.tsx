@@ -49,18 +49,18 @@ function DialogContent({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:items-center"
       role="dialog"
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 animate-fade-in bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 animate-fade-in bg-black/50 backdrop-blur-sm"
         onClick={() => setOpen(false)}
         aria-hidden="true"
       />
       <div
         className={cn(
-          "animate-scale-in relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-zinc-200/80 bg-white p-6 shadow-2xl shadow-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-950",
+          "animate-scale-in relative z-10 my-8 w-full max-w-lg rounded-xl border border-zinc-200/80 bg-white p-6 shadow-2xl shadow-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-950",
           className
         )}
       >
