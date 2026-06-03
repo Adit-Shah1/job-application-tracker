@@ -14,11 +14,23 @@ export function getGemini() {
 const buckets = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 5;
 const WINDOW_MS = 60_000;
+const CLEANUP_INTERVAL = 5 * 60_000;
+let lastCleanup = Date.now();
+
+function evictExpired() {
+  const now = Date.now();
+  if (now - lastCleanup < CLEANUP_INTERVAL) return;
+  lastCleanup = now;
+  for (const [key, bucket] of buckets) {
+    if (bucket.resetAt < now) buckets.delete(key);
+  }
+}
 
 export function checkAiRateLimit(userId: string): {
   ok: boolean;
   retryInSec?: number;
 } {
+  evictExpired();
   const now = Date.now();
   const bucket = buckets.get(userId);
   if (!bucket || bucket.resetAt < now) {

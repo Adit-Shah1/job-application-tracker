@@ -1,6 +1,13 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useOptimistic,
+  useTransition,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +25,10 @@ import type { ActionResult } from "@/lib/actions/applications";
 import { friendlyDate, isOverdue, fromNow } from "@/lib/dates";
 import { useToast } from "@/components/ui/toast";
 import { Bell, Check, Plus, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { Reminder, ReminderType } from "@/generated/prisma/client";
+
+type OptimisticReminder = Reminder & { isOptimistic?: boolean };
 
 export function RemindersList({
   applicationId,
@@ -27,6 +37,29 @@ export function RemindersList({
   applicationId: string;
   reminders: (Reminder & { application?: unknown })[];
 }) {
+  const [optimisticReminders, setOptimisticReminders] = useOptimistic(
+    reminders,
+    (
+      current: Reminder[],
+      update:
+        | { action: "add"; reminder: Reminder }
+        | { action: "remove"; id: string }
+        | { action: "complete"; id: string }
+    ) => {
+      if (update.action === "add") {
+        return [update.reminder, ...current];
+      }
+      if (update.action === "remove") {
+        return current.filter((r) => r.id !== update.id);
+      }
+      return current.map((r) =>
+        r.id === update.id
+          ? { ...r, completed: true, completedAt: new Date() }
+          : r
+      );
+    }
+  );
+
   const [state, action, pending] = useActionState<ActionResult | null, FormData>(
     createReminder.bind(null, applicationId),
     null
@@ -47,8 +80,8 @@ export function RemindersList({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  const incomplete = reminders.filter((r) => !r.completed);
-  const completed = reminders.filter((r) => r.completed);
+  const incomplete = optimisticReminders.filter((r) => !r.completed);
+  const completed = optimisticReminders.filter((r) => r.completed);
 
   return (
     <div className="space-y-4">
@@ -59,7 +92,26 @@ export function RemindersList({
       ) : (
         <form
           ref={formRef}
-          action={action}
+          action={(formData) => {
+            const dateStr = formData.get("reminderDate") as string;
+            const type = (formData.get("reminderType") as ReminderType) ?? "FOLLOW_UP";
+            if (dateStr) {
+              setOptimisticReminders({
+                action: "add",
+                reminder: {
+                  id: `optimistic-${Date.now()}`,
+                  applicationId,
+                  reminderDate: new Date(dateStr),
+                  reminderType: type,
+                  completed: false,
+                  completedAt: null,
+                  createdAt: new Date(),
+                  isOptimistic: true,
+                } as Reminder,
+              });
+            }
+            action(formData);
+          }}
           className="space-y-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/40"
         >
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -99,14 +151,24 @@ export function RemindersList({
         </form>
       )}
 
-      {reminders.length === 0 ? (
+      {optimisticReminders.length === 0 ? (
         <p className="rounded-md border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
           No reminders set. Stay on top of follow-ups.
         </p>
       ) : (
         <ul className="space-y-2">
           {incomplete.map((r) => (
-            <ReminderItem key={r.id} reminder={r} />
+            <ReminderItem
+              key={r.id}
+              reminder={r}
+              isOptimistic={"isOptimistic" in r ? (r as OptimisticReminder).isOptimistic : false}
+              onComplete={(id) => {
+                setOptimisticReminders({ action: "complete", id });
+              }}
+              onDelete={(id) => {
+                setOptimisticReminders({ action: "remove", id });
+              }}
+            />
           ))}
           {completed.length > 0 && (
             <>
@@ -114,7 +176,17 @@ export function RemindersList({
                 Completed
               </li>
               {completed.map((r) => (
-                <ReminderItem key={r.id} reminder={r} />
+                <ReminderItem
+                  key={r.id}
+                  reminder={r}
+                  isOptimistic={"isOptimistic" in r ? (r as OptimisticReminder).isOptimistic : false}
+                  onComplete={(id) => {
+                    setOptimisticReminders({ action: "complete", id });
+                  }}
+                  onDelete={(id) => {
+                    setOptimisticReminders({ action: "remove", id });
+                  }}
+                />
               ))}
             </>
           )}
@@ -124,38 +196,58 @@ export function RemindersList({
   );
 }
 
-function ReminderItem({ reminder }: { reminder: Reminder }) {
+function ReminderItem({
+  reminder,
+  isOptimistic,
+  onComplete,
+  onDelete,
+}: {
+  reminder: Reminder;
+  isOptimistic?: boolean;
+  onComplete: (id: string) => void;
+  onDelete: (id: string) => void;
+}) {
   const { toast } = useToast();
   const overdue = !reminder.completed && isOverdue(reminder.reminderDate);
+  const [actionPending, startActionTransition] = useTransition();
 
-  async function handleComplete() {
-    const res = await completeReminder(reminder.id);
-    if (res.ok) {
-      toast({ title: "Reminder completed" });
-    } else {
-      toast({ title: "Couldn't update reminder", description: res.error, variant: "destructive" });
-    }
+  function handleComplete() {
+    onComplete(reminder.id);
+    startActionTransition(async () => {
+      const res = await completeReminder(reminder.id);
+      if (!res.ok) {
+        toast({ title: "Couldn't update reminder", description: res.error, variant: "destructive" });
+      } else {
+        toast({ title: "Reminder completed" });
+      }
+    });
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     if (!confirm("Delete this reminder?")) return;
-    const res = await deleteReminder(reminder.id);
-    if (res.ok) {
-      toast({ title: "Reminder deleted" });
-    } else {
-      toast({ title: "Couldn't delete reminder", description: res.error, variant: "destructive" });
-    }
+    onDelete(reminder.id);
+    startActionTransition(async () => {
+      const res = await deleteReminder(reminder.id);
+      if (!res.ok) {
+        toast({ title: "Couldn't update reminder", description: res.error, variant: "destructive" });
+      } else {
+        toast({ title: "Reminder deleted" });
+      }
+    });
   }
 
   return (
     <li
-      className={
-        reminder.completed
-          ? "group flex items-center justify-between gap-2 rounded-lg border border-zinc-200/60 bg-zinc-50/60 p-3 text-sm transition-all duration-150 dark:border-zinc-800/60 dark:bg-zinc-900/30"
-          : overdue
-            ? "group flex items-center justify-between gap-2 rounded-lg border border-red-200 bg-gradient-to-br from-red-50 to-red-50/50 p-3 text-sm transition-all duration-150 hover:shadow-sm dark:border-red-900/40 dark:from-red-950/30 dark:to-red-950/10"
-            : "group flex items-center justify-between gap-2 rounded-lg border border-zinc-200/80 bg-white/80 p-3 text-sm transition-all duration-150 hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-950/80 dark:hover:border-zinc-700"
-      }
+      className={cn(
+        "group flex items-center justify-between gap-2 rounded-lg border p-3 text-sm transition-all duration-150",
+        isOptimistic
+          ? "border-indigo-200 bg-indigo-50/50 opacity-70 dark:border-indigo-900/40 dark:bg-indigo-950/20"
+          : reminder.completed
+            ? "border-zinc-200/60 bg-zinc-50/60 dark:border-zinc-800/60 dark:bg-zinc-900/30"
+            : overdue
+              ? "border-red-200 bg-gradient-to-br from-red-50 to-red-50/50 hover:shadow-sm dark:border-red-900/40 dark:from-red-950/30 dark:to-red-950/10"
+              : "border-zinc-200/80 bg-white/80 hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-950/80 dark:hover:border-zinc-700"
+      )}
     >
       <div className="flex min-w-0 flex-1 items-start gap-2">
         <Bell
@@ -193,6 +285,7 @@ function ReminderItem({ reminder }: { reminder: Reminder }) {
             size="icon"
             onClick={handleComplete}
             aria-label="Mark complete"
+            disabled={actionPending}
           >
             <Check size={14} />
           </Button>
@@ -202,6 +295,7 @@ function ReminderItem({ reminder }: { reminder: Reminder }) {
           size="icon"
           onClick={handleDelete}
           aria-label="Delete reminder"
+          disabled={actionPending}
         >
           <Trash2 size={14} />
         </Button>

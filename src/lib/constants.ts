@@ -58,6 +58,4 @@ export const REMINDER_TYPE_LABELS: Record<ReminderType, string> = {
   OTHER: "Other",
 };
 
-export function statusLabel(s: ApplicationStatus) {
-  return STATUS_LABELS[s];
-}
+

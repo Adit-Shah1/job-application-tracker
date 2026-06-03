@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -41,7 +41,8 @@ export function ApplicationForm({
     null
   );
 
-  if (state?.ok) {
+  useEffect(() => {
+    if (!state?.ok) return;
     if (mode === "create" && state.id) {
       toast({ title: "Application created" });
       router.push(`/applications/${state.id}`);
@@ -49,7 +50,8 @@ export function ApplicationForm({
       toast({ title: "Application updated" });
       router.push(`/applications/${application!.id}`);
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   const fieldErrors = state && !state.ok ? state.fieldErrors ?? {} : {};
 

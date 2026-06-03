@@ -27,12 +27,8 @@ export default function SettingsPage() {
         <ProfileCard />
       </Suspense>
 
-      <Suspense fallback={<CardSkeleton lines={2} />}>
-        <ConnectedProvidersCardWrapper />
-      </Suspense>
-
-      <Suspense fallback={<CardSkeleton lines={1} />}>
-        <PasswordCardWrapper />
+      <Suspense fallback={<><CardSkeleton lines={2} /><CardSkeleton lines={1} /></>}>
+        <AccountSettingsCards />
       </Suspense>
 
       <ThemeCard />
@@ -64,53 +60,37 @@ async function ProfileCard() {
   );
 }
 
-async function ConnectedProvidersCardWrapper() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  const accounts = userId
-    ? await prisma.account.findMany({
-        where: { userId },
-        select: { provider: true },
-      })
-    : [];
-  const linkedProviders = accounts
-    .map((a) => a.provider)
-    .filter((p): p is "github" | "google" => p === "github" || p === "google");
-
-  const user = userId
-    ? await prisma.user.findUnique({
-        where: { id: userId },
-        select: { passwordHash: true },
-      })
-    : null;
-  const hasPassword = !!user?.passwordHash;
-
-  return (
-    <ConnectedProvidersCard
-      linkedProviders={linkedProviders}
-      enabledProviders={enabledProviders}
-      hasPassword={hasPassword}
-    />
-  );
-}
-
-async function PasswordCardWrapper() {
+async function AccountSettingsCards() {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return null;
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { passwordHash: true },
-  });
+  const [accounts, user] = await Promise.all([
+    prisma.account.findMany({
+      where: { userId },
+      select: { provider: true },
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { passwordHash: true },
+    }),
+  ]);
+
+  const linkedProviders = accounts
+    .map((a) => a.provider)
+    .filter((p): p is "github" | "google" => p === "github" || p === "google");
   const hasPassword = !!user?.passwordHash;
 
-  const linkedCount = await prisma.account.count({
-    where: { userId },
-  });
-  const hasOAuth = linkedCount > 0;
-
-  return <PasswordCard hasPassword={hasPassword} hasOAuth={hasOAuth} />;
+  return (
+    <>
+      <ConnectedProvidersCard
+        linkedProviders={linkedProviders}
+        enabledProviders={enabledProviders}
+        hasPassword={hasPassword}
+      />
+      <PasswordCard hasPassword={hasPassword} hasOAuth={accounts.length > 0} />
+    </>
+  );
 }
 
 async function DeleteAccountCardWrapper() {

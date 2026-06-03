@@ -101,6 +101,7 @@ model Application {
   notes        Note[]
   reminders    Reminder[]
   emailDrafts  EmailDraft[]
+  statusChanges StatusChange[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -151,4 +152,15 @@ model EmailDraft {
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@index([applicationId, updatedAt])
+}
+
+model StatusChange {
+  id            String            @id @default(cuid())
+  applicationId String
+  fromStatus    ApplicationStatus
+  toStatus      ApplicationStatus
+  createdAt     DateTime          @default(now())
+  application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, createdAt])
 }

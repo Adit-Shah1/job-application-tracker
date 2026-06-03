@@ -5,17 +5,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { noteSchema } from "@/lib/validation";
 import type { ActionResult } from "@/lib/actions/applications";
-
-async function assertOwnsApplication(applicationId: string, userId: string) {
-  const app = await prisma.application.findUnique({
-    where: { id: applicationId },
-    select: { userId: true },
-  });
-  if (!app || app.userId !== userId) {
-    return false;
-  }
-  return true;
-}
+import { assertOwnsApplication } from "@/lib/actions/ownership";
 
 export async function createNote(
   applicationId: string,

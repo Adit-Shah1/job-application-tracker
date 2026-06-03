@@ -9,6 +9,8 @@ import {
   applicationCreateSchema,
   applicationUpdateSchema,
 } from "@/lib/validation";
+import { assertOwnsApplication } from "@/lib/actions/ownership";
+import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 
 export type ActionResult =
@@ -73,22 +75,38 @@ export async function updateApplication(
     return { ok: false, error: "Application not found." };
   }
   const data = parsed.data;
-  await prisma.application.update({
-    where: { id },
-    data: {
-      companyName: data.companyName,
-      roleTitle: data.roleTitle,
-      jobUrl: data.jobUrl ?? null,
-      location: data.location ?? null,
-      status: data.status,
-      salaryMin: data.salaryMin ?? null,
-      salaryMax: data.salaryMax ?? null,
-      currency: data.currency ?? null,
-      dateApplied: data.dateApplied ?? null,
-      priority: data.priority,
-      source: data.source ?? null,
-    },
-  });
+  const statusChanged = data.status && data.status !== existing.status;
+  const newStatus = data.status ?? existing.status;
+
+  await prisma.$transaction([
+    prisma.application.update({
+      where: { id },
+      data: {
+        companyName: data.companyName,
+        roleTitle: data.roleTitle,
+        jobUrl: data.jobUrl ?? null,
+        location: data.location ?? null,
+        status: data.status,
+        salaryMin: data.salaryMin ?? null,
+        salaryMax: data.salaryMax ?? null,
+        currency: data.currency ?? null,
+        dateApplied: data.dateApplied ?? null,
+        priority: data.priority,
+        source: data.source ?? null,
+      },
+    }),
+    ...(statusChanged
+      ? [
+          prisma.statusChange.create({
+            data: {
+              applicationId: id,
+              fromStatus: existing.status,
+              toStatus: newStatus,
+            },
+          }),
+        ]
+      : []),
+  ]);
   revalidatePath("/dashboard");
   revalidatePath("/applications");
   revalidatePath(`/applications/${id}`);
@@ -97,36 +115,47 @@ export async function updateApplication(
   return { ok: true };
 }
 
+const statusEnum = z.enum(["SAVED", "APPLIED", "INTERVIEWING", "OFFER", "REJECTED", "ARCHIVED"]);
+
 export async function updateApplicationStatus(
   id: string,
   status: string
 ): Promise<ActionResult> {
   const user = await requireUser();
-  const validStatuses = [
-    "SAVED",
-    "APPLIED",
-    "INTERVIEWING",
-    "OFFER",
-    "REJECTED",
-    "ARCHIVED",
-  ] as const;
-  if (!validStatuses.includes(status as (typeof validStatuses)[number])) {
+  const parsed = statusEnum.safeParse(status);
+  if (!parsed.success) {
     return { ok: false, error: "Invalid status." };
   }
   const existing = await prisma.application.findUnique({ where: { id } });
   if (!existing || existing.userId !== user.id) {
     return { ok: false, error: "Application not found." };
   }
-  await prisma.application.update({
-    where: { id },
-    data: {
-      status: status as (typeof validStatuses)[number],
-      dateApplied:
-        status === "APPLIED" && !existing.dateApplied
-          ? new Date()
-          : existing.dateApplied,
-    },
-  });
+  const newStatus = parsed.data;
+  const changed = existing.status !== newStatus;
+
+  await prisma.$transaction([
+    prisma.application.update({
+      where: { id },
+      data: {
+        status: newStatus,
+        dateApplied:
+          newStatus === "APPLIED" && !existing.dateApplied
+            ? new Date()
+            : existing.dateApplied,
+      },
+    }),
+    ...(changed
+      ? [
+          prisma.statusChange.create({
+            data: {
+              applicationId: id,
+              fromStatus: existing.status,
+              toStatus: newStatus,
+            },
+          }),
+        ]
+      : []),
+  ]);
   revalidatePath("/dashboard");
   revalidatePath("/applications");
   revalidatePath(`/applications/${id}`);
@@ -137,8 +166,7 @@ export async function updateApplicationStatus(
 
 export async function deleteApplication(id: string): Promise<ActionResult> {
   const user = await requireUser();
-  const existing = await prisma.application.findUnique({ where: { id } });
-  if (!existing || existing.userId !== user.id) {
+  if (!(await assertOwnsApplication(id, user.id))) {
     return { ok: false, error: "Application not found." };
   }
   await prisma.application.delete({ where: { id } });
@@ -186,6 +214,7 @@ export const listApplications = cache(
         { companyName: { contains: q, mode: "insensitive" } },
         { roleTitle: { contains: q, mode: "insensitive" } },
         { location: { contains: q, mode: "insensitive" } },
+        { notes: { some: { content: { contains: q, mode: "insensitive" } } } },
       ];
     }
     const orderBy: Prisma.ApplicationOrderByWithRelationInput =

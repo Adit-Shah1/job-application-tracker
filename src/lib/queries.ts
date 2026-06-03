@@ -82,12 +82,7 @@ async function loadDashboardSummary(userId: string): Promise<DashboardSummary> {
     interviewing: byStatus.INTERVIEWING,
     offers: byStatus.OFFER,
     byStatus,
-    upcomingReminders: upcoming.map((r) => ({
-      id: r.id,
-      reminderDate: r.reminderDate,
-      reminderType: r.reminderType,
-      application: r.application,
-    })),
+    upcomingReminders: upcoming,
     recentlyUpdated: recent,
   };
 }
@@ -110,6 +105,7 @@ async function loadApplicationDetail(userId: string, id: string) {
       notes: { orderBy: { createdAt: "desc" } },
       reminders: { orderBy: { reminderDate: "asc" } },
       emailDrafts: { orderBy: { updatedAt: "desc" } },
+      statusChanges: { orderBy: { createdAt: "desc" }, take: 20 },
     },
   });
   if (!app || app.userId !== userId) return null;

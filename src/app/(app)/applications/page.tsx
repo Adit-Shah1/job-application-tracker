@@ -3,6 +3,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { listApplications, type ApplicationFilters } from "@/lib/actions/applications";
 import { ApplicationsTable, ApplicationsEmptyState } from "@/components/applications/ApplicationsTable";
 import { ApplicationsFilterBar } from "@/components/applications/ApplicationsFilterBar";
+import { ExportCsvButton } from "@/components/applications/ExportCsvButton";
 import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
@@ -40,9 +41,12 @@ export default async function ApplicationsPage({
             <ApplicationsCount params={params} />
           </Suspense>
         </div>
-        <ButtonLink href="/applications/new">
-          <Plus size={15} /> New application
-        </ButtonLink>
+        <div className="flex gap-2">
+          <ExportCsvButton />
+          <ButtonLink href="/applications/new">
+            <Plus size={15} /> New application
+          </ButtonLink>
+        </div>
       </div>
 
       <Suspense>

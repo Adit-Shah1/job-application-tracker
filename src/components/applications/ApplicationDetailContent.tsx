@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button-link";
 import { StatusSelect } from "@/components/applications/StatusSelect";
 import { StatusBadge } from "@/components/applications/StatusBadge";
+import { StatusTimeline } from "@/components/applications/StatusTimeline";
+import { InlineEditFields } from "@/components/applications/InlineEditFields";
 import { NotesList } from "@/components/notes/NotesList";
 import { RemindersList } from "@/components/reminders/RemindersList";
 import { DeleteApplicationButton } from "@/components/applications/DeleteApplicationButton";
@@ -68,8 +70,9 @@ export async function ApplicationDetailContent({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle>Details</CardTitle>
+              <InlineEditFields application={app} />
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <DetailRow icon={<Briefcase size={14} />} label="Company" value={app.companyName} />
@@ -123,6 +126,15 @@ export async function ApplicationDetailContent({
                 applicationId={app.id}
                 reminders={app.reminders}
               />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <StatusTimeline changes={app.statusChanges} />
             </CardContent>
           </Card>
         </div>
