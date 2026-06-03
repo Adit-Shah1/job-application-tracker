@@ -110,7 +110,7 @@ export function KanbanBoard({ applications }: { applications: AppCard[] }) {
   }, []);
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       {APPLICATION_STATUSES.map((status) => {
         const apps = columns[status];
         const isOver = overColumn === status;
@@ -118,7 +118,7 @@ export function KanbanBoard({ applications }: { applications: AppCard[] }) {
           <div
             key={status}
             className={cn(
-              "flex min-w-[260px] flex-1 flex-col rounded-xl border-t-2 bg-zinc-50/50 transition-colors dark:bg-zinc-900/50",
+              "flex min-h-[200px] flex-col rounded-xl border-t-2 bg-zinc-50/50 transition-colors dark:bg-zinc-900/50",
               COLUMN_COLORS[status],
               isOver && "bg-indigo-50/50 dark:bg-indigo-950/20 ring-2 ring-indigo-300/50 dark:ring-indigo-700/50"
             )}
