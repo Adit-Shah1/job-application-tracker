@@ -43,6 +43,7 @@ export function ApplicationsFilterBar() {
       } else {
         params.set(key, value);
       }
+      params.delete("page");
       router.push(`${pathname}?${params.toString()}`);
     },
     [pathname, router, searchParams]

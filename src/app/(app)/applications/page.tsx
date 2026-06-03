@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import { ButtonLink } from "@/components/ui/button-link";
-import { listApplications } from "@/lib/actions/applications";
+import { listApplications, type ApplicationFilters } from "@/lib/actions/applications";
 import { ApplicationsTable, ApplicationsEmptyState } from "@/components/applications/ApplicationsTable";
 import { ApplicationsFilterBar } from "@/components/applications/ApplicationsFilterBar";
+import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 
@@ -13,6 +14,7 @@ type SearchParams = {
   priority?: string;
   search?: string;
   sort?: "recent" | "oldest" | "company" | "status";
+  page?: string;
 };
 
 export default async function ApplicationsPage({
@@ -55,19 +57,38 @@ export default async function ApplicationsPage({
 }
 
 async function ApplicationsCount({ params }: { params: SearchParams }) {
-  const applications = await listApplications(params);
+  const result = await listApplications({
+    status: params.status,
+    priority: params.priority,
+    search: params.search,
+    sort: params.sort,
+    pageSize: 1,
+  });
   return (
     <p className="text-sm text-zinc-500 dark:text-zinc-400">
-      {applications.length}{" "}
-      {applications.length === 1 ? "application" : "applications"}
+      {result.total}{" "}
+      {result.total === 1 ? "application" : "applications"}
     </p>
   );
 }
 
 async function ApplicationsList({ params }: { params: SearchParams }) {
-  const applications = await listApplications(params);
-  if (applications.length === 0) return <ApplicationsEmptyState />;
-  return <ApplicationsTable applications={applications} />;
+  const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
+  const filters: ApplicationFilters = {
+    status: params.status,
+    priority: params.priority,
+    search: params.search,
+    sort: params.sort,
+    page,
+  };
+  const result = await listApplications(filters);
+  if (result.total === 0) return <ApplicationsEmptyState />;
+  return (
+    <>
+      <ApplicationsTable applications={result.data} />
+      <Pagination currentPage={result.page} totalPages={result.totalPages} />
+    </>
+  );
 }
 
 function ApplicationsTableFallback() {

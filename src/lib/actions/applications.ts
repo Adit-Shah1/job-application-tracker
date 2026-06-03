@@ -154,10 +154,24 @@ export type ApplicationFilters = {
   priority?: string;
   search?: string;
   sort?: "recent" | "oldest" | "company" | "status";
+  page?: number;
+  pageSize?: number;
+};
+
+type ApplicationWithCount = Prisma.ApplicationGetPayload<{
+  include: { _count: { select: { notes: true; reminders: true } } };
+}>;
+
+export type ListResult = {
+  data: ApplicationWithCount[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 };
 
 export const listApplications = cache(
-  async (filters: ApplicationFilters = {}) => {
+  async (filters: ApplicationFilters = {}): Promise<ListResult> => {
     const user = await requireUser();
     const where: Prisma.ApplicationWhereInput = { userId: user.id };
     if (filters.status && filters.status !== "ALL") {
@@ -183,12 +197,29 @@ export const listApplications = cache(
             ? { status: "asc" }
             : { lastUpdated: "desc" };
 
-    return prisma.application.findMany({
-      where,
-      orderBy,
-      include: {
-        _count: { select: { notes: true, reminders: true } },
-      },
-    });
+    const page = Math.max(1, filters.page ?? 1);
+    const pageSize = Math.max(1, Math.min(100, filters.pageSize ?? 20));
+    const skip = (page - 1) * pageSize;
+
+    const [data, total] = await Promise.all([
+      prisma.application.findMany({
+        where,
+        orderBy,
+        skip,
+        take: pageSize,
+        include: {
+          _count: { select: { notes: true, reminders: true } },
+        },
+      }),
+      prisma.application.count({ where }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 );
