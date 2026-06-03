@@ -1,27 +1,40 @@
 import { notFound } from "next/navigation";
 import { getApplicationDetail } from "@/lib/queries";
+import { getApplicationP2Fields } from "@/lib/actions/resumes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button-link";
 import { StatusSelect } from "@/components/applications/StatusSelect";
 import { StatusBadge } from "@/components/applications/StatusBadge";
 import { StatusTimeline } from "@/components/applications/StatusTimeline";
 import { InlineEditFields } from "@/components/applications/InlineEditFields";
+import { ContactSection } from "@/components/applications/ContactSection";
+import { CoverLetterSection } from "@/components/applications/CoverLetterSection";
+import { ResumeSection } from "@/components/applications/ResumeSection";
 import { NotesList } from "@/components/notes/NotesList";
 import { RemindersList } from "@/components/reminders/RemindersList";
 import { DeleteApplicationButton } from "@/components/applications/DeleteApplicationButton";
 import { FollowUpButton } from "@/components/ai/FollowUpButton";
+import { AIInsightsButton } from "@/components/ai/AIInsightsButton";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/dates";
 import { PRIORITY_LABELS } from "@/lib/constants";
-import { ArrowLeft, ExternalLink, Pencil, MapPin, Briefcase, Calendar, DollarSign, Link2, Tag } from "lucide-react";
+import { ArrowLeft, ExternalLink, Pencil, MapPin, Briefcase, Calendar, DollarSign, Link2, Tag, Mail, Phone, User } from "lucide-react";
 
 export async function ApplicationDetailContent({
   id,
 }: {
   id: string;
 }) {
-  const app = await getApplicationDetail(id);
+  const [app, p2Fields] = await Promise.all([
+    getApplicationDetail(id),
+    getApplicationP2Fields(id),
+  ]);
   if (!app) notFound();
+  const contactName = p2Fields?.contactName ?? null;
+  const contactEmail = p2Fields?.contactEmail ?? null;
+  const contactPhone = p2Fields?.contactPhone ?? null;
+  const coverLetter = p2Fields?.coverLetter ?? null;
+  const resumeVersionId = p2Fields?.resumeVersionId ?? null;
 
   const salary =
     app.salaryMin || app.salaryMax
@@ -59,6 +72,11 @@ export async function ApplicationDetailContent({
             </div>
           </div>
           <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:flex-shrink-0">
+            <AIInsightsButton
+              applicationId={app.id}
+              companyName={app.companyName}
+              roleTitle={app.roleTitle}
+            />
             <ButtonLink href={`/applications/${app.id}/edit`} variant="outline" size="sm">
               <Pencil size={14} /> Edit
             </ButtonLink>
@@ -114,6 +132,46 @@ export async function ApplicationDetailContent({
                   }
                 />
               )}
+              {(contactName || contactEmail || contactPhone) && (
+                <>
+                  <div className="border-t border-zinc-100 dark:border-zinc-800" />
+                  {contactName && (
+                    <DetailRow icon={<User size={14} />} label="Contact" value={contactName} />
+                  )}
+                  {contactEmail && (
+                    <DetailRow
+                      icon={<Mail size={14} />}
+                      label="Email"
+                      value={
+                        <a href={`mailto:${contactEmail}`} className="text-blue-600 hover:underline">
+                          {contactEmail}
+                        </a>
+                      }
+                    />
+                  )}
+                  {contactPhone && (
+                    <DetailRow
+                      icon={<Phone size={14} />}
+                      label="Phone"
+                      value={
+                        <a href={`tel:${contactPhone}`} className="text-blue-600 hover:underline">
+                          {contactPhone}
+                        </a>
+                      }
+                    />
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle>Contacts & Resume</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ContactSection applicationId={app.id} contactName={contactName} contactEmail={contactEmail} contactPhone={contactPhone} />
+              <ResumeSection applicationId={app.id} selectedResumeId={resumeVersionId} />
             </CardContent>
           </Card>
 
@@ -140,6 +198,18 @@ export async function ApplicationDetailContent({
         </div>
 
         <div className="space-y-6 lg:col-span-2">
+          {coverLetter && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Cover Letter</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CoverLetterSection applicationId={app.id} initialContent={coverLetter} />
+              </CardContent>
+            </Card>
+          )}
+          {!coverLetter && <CoverLetterSection applicationId={app.id} initialContent={null} collapsed />}
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
