@@ -10,8 +10,16 @@ import {
   listResumes,
   type ActionResult,
 } from "@/lib/actions/resumes";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useActionState } from "react";
-import { FileText, Plus, Trash2, ExternalLink, X } from "lucide-react";
+import { FileText, Plus, Trash2, ExternalLink, X, Loader2 } from "lucide-react";
 
 type Resume = {
   id: string;
@@ -59,19 +67,26 @@ export function ResumeManager({
     null
   );
 
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this resume? It will be unlinked from any applications.")) return;
-    const res = await deleteResume(id);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deletePending, setDeletePending] = useState(false);
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeletePending(true);
+    const res = await deleteResume(deleteTarget);
+    setDeletePending(false);
     if (res.ok) {
-      setResumes((prev) => prev.filter((r) => r.id !== id));
-      if (selectedResumeId === id && onSelect) onSelect(null);
+      setResumes((prev) => prev.filter((r) => r.id !== deleteTarget));
+      if (selectedResumeId === deleteTarget && onSelect) onSelect(null);
       toast({ title: "Resume deleted" });
     } else {
       toast({ title: "Couldn't delete", description: res.error, variant: "destructive" });
     }
+    setDeleteTarget(null);
   }
 
   return (
+    <>
     <div className="space-y-3">
       {/* Resume list */}
       {loading ? (
@@ -118,7 +133,7 @@ export function ResumeManager({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete(r.id);
+                    setDeleteTarget(r.id);
                   }}
                   className="rounded p-1 text-zinc-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-950/30"
                 >
@@ -159,5 +174,34 @@ export function ResumeManager({
         </Button>
       )}
     </div>
+
+    <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete resume</DialogTitle>
+          <DialogDescription>
+            This resume will be permanently deleted and unlinked from any applications. This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={deletePending}>
+            Cancel
+          </Button>
+          <Button
+            variant="outline"
+            onClick={confirmDelete}
+            disabled={deletePending}
+            className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30"
+          >
+            {deletePending ? (
+              <><Loader2 size={14} className="animate-spin" /> Deleting…</>
+            ) : (
+              <><Trash2 size={14} /> Delete resume</>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

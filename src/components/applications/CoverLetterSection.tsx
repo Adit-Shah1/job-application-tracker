@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { updateContactInfo } from "@/lib/actions/resumes";
+import { updateCoverLetter } from "@/lib/actions/resumes";
 import { useToast } from "@/components/ui/toast";
 import { Pencil, X, Check, FileText } from "lucide-react";
 
@@ -22,10 +22,11 @@ export function CoverLetterSection({
   const { toast } = useToast();
 
   function handleSubmit(formData: FormData) {
+    const coverLetterContent = String(formData.get("coverLetter") ?? "");
     startTransition(async () => {
-      const res = await updateContactInfo(applicationId, formData);
+      const res = await updateCoverLetter(applicationId, coverLetterContent || null);
       if (res.ok) {
-        setContent(String(formData.get("coverLetter") ?? ""));
+        setContent(coverLetterContent);
         setEditing(false);
         toast({ title: "Cover letter saved" });
       } else {
@@ -77,10 +78,6 @@ export function CoverLetterSection({
         placeholder="Paste or write your cover letter here…"
         className="resize-y"
       />
-      <input type="hidden" name="contactName" value="" />
-      <input type="hidden" name="contactEmail" value="" />
-      <input type="hidden" name="contactPhone" value="" />
-      <input type="hidden" name="resumeVersionId" value="" />
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)}>
           <X size={14} /> Cancel

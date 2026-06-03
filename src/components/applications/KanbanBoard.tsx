@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect, useTransition } from "react";
+import { useState, useRef, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
@@ -172,12 +172,26 @@ function KanbanCard({
 }) {
   const priorityVariant = app.priority === "HIGH" ? "danger" : app.priority === "MEDIUM" ? "warning" : "muted";
 
+  const wasDragging = useRef(false);
+
   return (
     <a
       href={`/applications/${app.id}`}
       draggable
-      onDragStart={(e) => onDragStart(e, app.id)}
-      onDragEnd={onDragEnd}
+      onDragStart={(e) => {
+        wasDragging.current = false;
+        onDragStart(e, app.id);
+      }}
+      onDragEnd={() => {
+        wasDragging.current = true;
+        onDragEnd();
+      }}
+      onClick={(e) => {
+        if (wasDragging.current) {
+          e.preventDefault();
+          wasDragging.current = false;
+        }
+      }}
       className={cn(
         "group block cursor-grab rounded-lg border border-zinc-200/80 bg-white p-3 text-sm shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing dark:border-zinc-800 dark:bg-zinc-950",
         isDragging && "opacity-50 scale-95"

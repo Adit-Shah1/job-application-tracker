@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { updateContactInfo } from "@/lib/actions/resumes";
+import { updateResumeLink } from "@/lib/actions/resumes";
 import { ResumeManager } from "@/components/applications/ResumeManager";
 import { useToast } from "@/components/ui/toast";
 import { FileText } from "lucide-react";
@@ -20,14 +20,8 @@ export function ResumeSection({
 
   function handleSelect(id: string | null) {
     setSelectedId(id);
-    const fd = new FormData();
-    fd.set("resumeVersionId", id ?? "");
-    fd.set("contactName", "");
-    fd.set("contactEmail", "");
-    fd.set("contactPhone", "");
-    fd.set("coverLetter", "");
     startTransition(async () => {
-      const res = await updateContactInfo(applicationId, fd);
+      const res = await updateResumeLink(applicationId, id);
       if (res.ok) {
         toast({ title: id ? "Resume linked" : "Resume unlinked" });
       } else {

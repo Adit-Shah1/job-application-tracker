@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { updateContactInfo } from "@/lib/actions/resumes";
+import { updateContactOnly } from "@/lib/actions/resumes";
 import { useToast } from "@/components/ui/toast";
 import { Pencil, X, Check, User, Mail, Phone } from "lucide-react";
 
@@ -27,7 +27,7 @@ export function ContactSection({
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
-      const res = await updateContactInfo(applicationId, formData);
+      const res = await updateContactOnly(applicationId, formData);
       if (res.ok) {
         setContactName(String(formData.get("contactName") ?? ""));
         setContactEmail(String(formData.get("contactEmail") ?? ""));
@@ -94,8 +94,6 @@ export function ContactSection({
       <Input name="contactName" defaultValue={contactName} placeholder="Name" />
       <Input name="contactEmail" type="email" defaultValue={contactEmail} placeholder="email@company.com" />
       <Input name="contactPhone" type="tel" defaultValue={contactPhone} placeholder="+1 (555) 000-0000" />
-      <input type="hidden" name="coverLetter" value="" />
-      <input type="hidden" name="resumeVersionId" value="" />
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)}>
           <X size={14} /> Cancel

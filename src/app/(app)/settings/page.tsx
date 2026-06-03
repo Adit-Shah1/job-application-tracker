@@ -127,11 +127,11 @@ function AboutCard() {
           Job Application Tracker helps you keep every application,
           interview, and follow-up in one place.
         </p>
-        <p className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant="muted">Built with Next.js</Badge>
           <Badge variant="muted">Prisma + Postgres</Badge>
           <Badge variant="muted">Gemini AI</Badge>
-        </p>
+        </div>
         <a
           href={REPO_URL}
           target="_blank"

@@ -181,7 +181,7 @@ export function StatusSelect({
           size={14}
           className={cn(
             "text-zinc-400 transition-transform duration-150",
-            open && "rotate-180"
+            (open || closing) && "rotate-180"
           )}
         />
       </button>

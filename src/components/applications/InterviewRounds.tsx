@@ -11,14 +11,24 @@ import {
   createInterviewRound,
   updateInterviewRound,
   deleteInterviewRound,
+  type ActionResult,
+} from "@/lib/actions/interviews";
+import {
   INTERVIEW_TYPE_LABELS,
   OUTCOME_LABELS,
-  type ActionResult,
+  INTERVIEW_TYPES,
+  OUTCOMES,
   type InterviewRoundRow,
-  type InterviewRoundType,
-  type InterviewOutcome,
-} from "@/lib/actions/interviews";
+} from "@/lib/interviews";
 import { formatDate } from "@/lib/dates";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Plus,
   Trash2,
@@ -33,10 +43,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const INTERVIEW_TYPES: InterviewRoundType[] = [
-  "PHONE_SCREEN", "TECHNICAL", "BEHAVIORAL", "SYSTEM_DESIGN", "ONSITE", "FINAL", "OTHER",
-];
-const OUTCOMES: InterviewOutcome[] = ["PENDING", "PASSED", "FAILED", "NO_SHOW"];
+
 
 const OUTCOME_COLORS: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
@@ -75,15 +82,21 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
     null
   );
 
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this interview round?")) return;
-    const res = await deleteInterviewRound(id);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deletePending, setDeletePending] = useState(false);
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeletePending(true);
+    const res = await deleteInterviewRound(deleteTarget);
+    setDeletePending(false);
     if (res.ok) {
-      setRounds((prev) => prev.filter((r) => r.id !== id));
+      setRounds((prev) => prev.filter((r) => r.id !== deleteTarget));
       toast({ title: "Interview round deleted" });
     } else {
       toast({ title: "Couldn't delete", description: res.error, variant: "destructive" });
     }
+    setDeleteTarget(null);
   }
 
   if (loading) {
@@ -91,6 +104,7 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
   }
 
   return (
+    <>
     <div className="space-y-3">
       {rounds.length === 0 && !showAdd && (
         <div className="rounded-md border border-dashed border-zinc-200 p-4 text-center text-xs text-zinc-500 dark:border-zinc-800">
@@ -159,7 +173,7 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
               </button>
               <button
                 type="button"
-                onClick={() => handleDelete(round.id)}
+                onClick={() => setDeleteTarget(round.id)}
                 className="rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
               >
                 <Trash2 size={12} />
@@ -242,6 +256,35 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
         </Button>
       )}
     </div>
+
+    <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete interview round</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this interview round? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={deletePending}>
+            Cancel
+          </Button>
+          <Button
+            variant="outline"
+            onClick={confirmDelete}
+            disabled={deletePending}
+            className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30"
+          >
+            {deletePending ? (
+              <><Loader2 size={14} className="animate-spin" /> Deleting…</>
+            ) : (
+              <><Trash2 size={14} /> Delete round</>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 

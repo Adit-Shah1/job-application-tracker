@@ -11,14 +11,6 @@ const resumeCreateSchema = z.object({
   fileUrl: z.string().url("Must be a valid URL").max(500),
 });
 
-const contactUpdateSchema = z.object({
-  contactName: z.string().max(120).nullable().optional(),
-  contactEmail: z.string().email("Invalid email").max(255).nullable().optional(),
-  contactPhone: z.string().max(40).nullable().optional(),
-  coverLetter: z.string().max(50000).nullable().optional(),
-  resumeVersionId: z.string().nullable().optional(),
-});
-
 export type ActionResult =
   | { ok: true; id?: string }
   | { ok: false; error: string; fieldErrors?: Record<string, string[]> };
@@ -72,15 +64,25 @@ export async function deleteResume(id: string): Promise<ActionResult> {
 
 // --- Contact / Cover Letter fields (raw SQL since Prisma types don't include P2 columns) ---
 
-export async function updateContactInfo(
+// Helper: verify application ownership
+async function verifyAppOwnership(applicationId: string, userId: string) {
+  const app = await prisma.application.findUnique({ where: { id: applicationId } });
+  if (!app || app.userId !== userId) return false;
+  return true;
+}
+
+const contactOnlySchema = z.object({
+  contactName: z.string().max(120).nullable().optional(),
+  contactEmail: z.string().email("Invalid email").max(255).nullable().optional(),
+  contactPhone: z.string().max(40).nullable().optional(),
+});
+
+export async function updateContactOnly(
   applicationId: string,
   formData: FormData
 ): Promise<ActionResult> {
   const user = await requireUser();
-
-  // Verify ownership
-  const app = await prisma.application.findUnique({ where: { id: applicationId } });
-  if (!app || app.userId !== user.id) {
+  if (!(await verifyAppOwnership(applicationId, user.id))) {
     return { ok: false, error: "Application not found." };
   }
 
@@ -88,17 +90,11 @@ export async function updateContactInfo(
     contactName: formData.get("contactName") || null,
     contactEmail: formData.get("contactEmail") || null,
     contactPhone: formData.get("contactPhone") || null,
-    coverLetter: formData.get("coverLetter") || null,
-    resumeVersionId: formData.get("resumeVersionId") || null,
   };
 
-  const parsed = contactUpdateSchema.safeParse(raw);
+  const parsed = contactOnlySchema.safeParse(raw);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error: "Please fix the errors below.",
-      fieldErrors: parsed.error.flatten().fieldErrors,
-    };
+    return { ok: false, error: "Please fix the errors below.", fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
   const d = parsed.data;
@@ -107,8 +103,44 @@ export async function updateContactInfo(
     SET "contactName" = ${d.contactName ?? null},
         "contactEmail" = ${d.contactEmail ?? null},
         "contactPhone" = ${d.contactPhone ?? null},
-        "coverLetter" = ${d.coverLetter ?? null},
-        "resumeVersionId" = ${d.resumeVersionId ?? null},
+        "lastUpdated" = NOW()
+    WHERE "id" = ${applicationId}
+  `;
+
+  return { ok: true };
+}
+
+export async function updateCoverLetter(
+  applicationId: string,
+  content: string | null
+): Promise<ActionResult> {
+  const user = await requireUser();
+  if (!(await verifyAppOwnership(applicationId, user.id))) {
+    return { ok: false, error: "Application not found." };
+  }
+
+  await prisma.$executeRaw`
+    UPDATE "Application"
+    SET "coverLetter" = ${content},
+        "lastUpdated" = NOW()
+    WHERE "id" = ${applicationId}
+  `;
+
+  return { ok: true };
+}
+
+export async function updateResumeLink(
+  applicationId: string,
+  resumeVersionId: string | null
+): Promise<ActionResult> {
+  const user = await requireUser();
+  if (!(await verifyAppOwnership(applicationId, user.id))) {
+    return { ok: false, error: "Application not found." };
+  }
+
+  await prisma.$executeRaw`
+    UPDATE "Application"
+    SET "resumeVersionId" = ${resumeVersionId},
         "lastUpdated" = NOW()
     WHERE "id" = ${applicationId}
   `;
