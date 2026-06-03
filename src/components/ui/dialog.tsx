@@ -50,9 +50,16 @@ function DialogContent({
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
+      const handler = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setOpen(false);
+      };
+      document.addEventListener("keydown", handler);
+      return () => {
+        document.body.style.overflow = "";
+        document.removeEventListener("keydown", handler);
+      };
     }
-  }, [open]);
+  }, [open, setOpen]);
   if (!open) return null;
   const dialog = (
     <div

@@ -50,95 +50,97 @@ export function AuthForm() {
       </div>
 
       <form action={formAction} className="space-y-4">
-        {mode === "signup" && (
+        <div key={mode} className="animate-fade-in space-y-4">
+          {mode === "signup" && (
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Your name"
+                autoComplete="name"
+              />
+              {fieldErrors.name && (
+                <p className="text-xs text-red-600">{fieldErrors.name[0]}</p>
+              )}
+            </div>
+          )}
+
           <div className="space-y-1.5">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="Your name"
-              autoComplete="name"
-            />
-            {fieldErrors.name && (
-              <p className="text-xs text-red-600">{fieldErrors.name[0]}</p>
+            <Label htmlFor="email">Email</Label>
+            <div className="relative">
+              <Mail
+                size={14}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                className="pl-9"
+                autoComplete="email"
+                required
+              />
+            </div>
+            {fieldErrors.email && (
+              <p className="text-xs text-red-600">{fieldErrors.email[0]}</p>
             )}
           </div>
-        )}
 
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail
-              size={14}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-            />
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              className="pl-9"
-              autoComplete="email"
-              required
-            />
+          <div className="space-y-1.5">
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Lock
+                size={14}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder={mode === "signup" ? "At least 8 characters" : "Your password"}
+                className="pl-9 pr-9"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                required
+                minLength={mode === "signup" ? 8 : undefined}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+            {fieldErrors.password && (
+              <p className="text-xs text-red-600">{fieldErrors.password[0]}</p>
+            )}
+            {mode === "signup" && (
+              <p className="text-xs text-zinc-500">Must be at least 8 characters.</p>
+            )}
           </div>
-          {fieldErrors.email && (
-            <p className="text-xs text-red-600">{fieldErrors.email[0]}</p>
+
+          {state && !state.ok && !Object.keys(fieldErrors).length && (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-200">
+              {state.error}
+            </div>
           )}
+
+          <Button type="submit" disabled={pending} className="w-full" size="lg">
+            {pending && <Loader2 size={15} className="animate-spin" />}
+            {pending
+              ? mode === "signin"
+                ? "Signing in…"
+                : "Creating account…"
+              : mode === "signin"
+                ? "Sign in"
+                : "Create account"}
+          </Button>
         </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
-          <div className="relative">
-            <Lock
-              size={14}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-            />
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder={mode === "signup" ? "At least 8 characters" : "Your password"}
-              className="pl-9 pr-9"
-              autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              required
-              minLength={mode === "signup" ? 8 : undefined}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-              tabIndex={-1}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-            </button>
-          </div>
-          {fieldErrors.password && (
-            <p className="text-xs text-red-600">{fieldErrors.password[0]}</p>
-          )}
-          {mode === "signup" && (
-            <p className="text-xs text-zinc-500">Must be at least 8 characters.</p>
-          )}
-        </div>
-
-        {state && !state.ok && !Object.keys(fieldErrors).length && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-200">
-            {state.error}
-          </div>
-        )}
-
-        <Button type="submit" disabled={pending} className="w-full" size="lg">
-          {pending && <Loader2 size={15} className="animate-spin" />}
-          {pending
-            ? mode === "signin"
-              ? "Signing in…"
-              : "Creating account…"
-            : mode === "signin"
-              ? "Sign in"
-              : "Create account"}
-        </Button>
       </form>
     </div>
   );

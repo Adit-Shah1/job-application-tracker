@@ -18,6 +18,8 @@ import {
 } from "@/lib/constants";
 import { Search } from "lucide-react";
 
+const TAG_BLOCKLIST = new Set(["INPUT", "TEXTAREA", "SELECT"]);
+
 const SEARCH_DEBOUNCE_MS = 250;
 
 export function ApplicationsFilterBar() {
@@ -28,6 +30,19 @@ export function ApplicationsFilterBar() {
     searchParams.get("search") ?? ""
   );
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "/") return;
+      const target = e.target as HTMLElement;
+      if (TAG_BLOCKLIST.has(target.tagName) || target.isContentEditable) return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -68,8 +83,9 @@ export function ApplicationsFilterBar() {
           aria-hidden="true"
         />
         <Input
+          ref={searchRef}
           type="search"
-          placeholder="Search company, role, location…"
+          placeholder='Search company, role, location… (press "/" to focus)'
           value={searchValue}
           onChange={handleSearchChange}
           className="pl-8"

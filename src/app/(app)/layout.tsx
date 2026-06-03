@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/ui/nav-link";
 import { MobileNav } from "@/components/ui/mobile-nav";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { NavShortcuts } from "@/components/ui/nav-shortcuts";
 import {
   LayoutDashboard,
   Briefcase,
@@ -26,7 +27,9 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <>
+      <NavShortcuts />
+      <div className="flex min-h-screen flex-col">
       <header
         className="sticky top-0 z-30 border-b border-zinc-200 bg-white shadow-[0_1px_0_0_rgba(0,0,0,0.02)] dark:border-zinc-800 dark:bg-zinc-950"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
@@ -114,5 +117,6 @@ export default async function AppLayout({
         {children}
       </main>
     </div>
+    </>
   );
 }
