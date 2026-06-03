@@ -64,6 +64,45 @@ export const emailDraftSchema = z.object({
   tone: z.enum(["professional", "friendly"]),
 });
 
+export const emailSchema = z.string().email("Invalid email address").max(255);
+
+export const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .max(128, "Password must be under 128 characters");
+
+export const signUpSchema = z.object({
+  name: z.string().min(1, "Name is required").max(120).optional(),
+  email: emailSchema,
+  password: passwordSchema,
+});
+
+export const signInSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, "Password is required"),
+});
+
+export const setPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: passwordSchema,
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
 export type ApplicationCreateInput = z.infer<typeof applicationCreateSchema>;
 export type ApplicationUpdateInput = z.infer<typeof applicationUpdateSchema>;
 export type NoteInput = z.infer<typeof noteSchema>;

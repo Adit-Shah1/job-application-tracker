@@ -74,9 +74,11 @@ const PROVIDERS: Array<{
 export function ConnectedProvidersCard({
   linkedProviders,
   enabledProviders,
+  hasPassword = false,
 }: {
   linkedProviders: ProviderId[];
   enabledProviders: { github: boolean; google: boolean };
+  hasPassword?: boolean;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -86,7 +88,7 @@ export function ConnectedProvidersCard({
     null
   );
 
-  const isLastProvider = linkedProviders.length <= 1;
+  const isLastProvider = linkedProviders.length <= 1 && !hasPassword;
   const linkedSet = new Set(linkedProviders);
 
   if (state?.ok && unlinkTarget) {
@@ -152,7 +154,7 @@ export function ConnectedProvidersCard({
                       disabled={cannotUnlink}
                       title={
                         cannotUnlink
-                          ? "Connect another provider before disconnecting this one."
+                          ? "Set a password or connect another provider before disconnecting this one."
                           : undefined
                       }
                     >

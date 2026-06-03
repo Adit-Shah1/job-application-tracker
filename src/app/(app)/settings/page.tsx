@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { ConnectedProvidersCard } from "@/components/settings/ConnectedProvidersCard";
+import { PasswordCard } from "@/components/settings/PasswordCard";
 import { DeleteAccountCard } from "@/components/settings/DeleteAccountCard";
 
 export const metadata = { title: "Settings · Job Tracker" };
@@ -27,6 +28,10 @@ export default function SettingsPage() {
 
       <Suspense fallback={<CardSkeleton lines={2} />}>
         <ConnectedProvidersCardWrapper />
+      </Suspense>
+
+      <Suspense fallback={<CardSkeleton lines={1} />}>
+        <PasswordCardWrapper />
       </Suspense>
 
       <AboutCard />
@@ -69,12 +74,40 @@ async function ConnectedProvidersCardWrapper() {
     .map((a) => a.provider)
     .filter((p): p is "github" | "google" => p === "github" || p === "google");
 
+  const user = userId
+    ? await prisma.user.findUnique({
+        where: { id: userId },
+        select: { passwordHash: true },
+      })
+    : null;
+  const hasPassword = !!user?.passwordHash;
+
   return (
     <ConnectedProvidersCard
       linkedProviders={linkedProviders}
       enabledProviders={enabledProviders}
+      hasPassword={hasPassword}
     />
   );
+}
+
+async function PasswordCardWrapper() {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { passwordHash: true },
+  });
+  const hasPassword = !!user?.passwordHash;
+
+  const linkedCount = await prisma.account.count({
+    where: { userId },
+  });
+  const hasOAuth = linkedCount > 0;
+
+  return <PasswordCard hasPassword={hasPassword} hasOAuth={hasOAuth} />;
 }
 
 async function DeleteAccountCardWrapper() {

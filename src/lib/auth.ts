@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/db";
 
@@ -26,11 +28,25 @@ if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
   );
 }
 
-if (providers.length === 0) {
-  console.warn(
-    "[auth] No OAuth providers configured. Set AUTH_GITHUB_ID/SECRET and/or AUTH_GOOGLE_ID/SECRET in .env to enable sign-in."
-  );
-}
+providers.push(
+  Credentials({
+    name: "credentials",
+    credentials: {
+      email: { label: "Email", type: "email" },
+      password: { label: "Password", type: "password" },
+    },
+    async authorize(credentials) {
+      if (!credentials?.email || !credentials?.password) return null;
+      const email = String(credentials.email);
+      const password = String(credentials.password);
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user?.passwordHash) return null;
+      const valid = await bcrypt.compare(password, user.passwordHash);
+      if (!valid) return null;
+      return { id: user.id, email: user.email, name: user.name, image: user.image };
+    },
+  })
+);
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
