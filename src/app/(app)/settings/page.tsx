@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { ConnectedProvidersCard } from "@/components/settings/ConnectedProvidersCard";
 import { PasswordCard } from "@/components/settings/PasswordCard";
+import { ThemeCard } from "@/components/settings/ThemeCard";
 import { DeleteAccountCard } from "@/components/settings/DeleteAccountCard";
 
 export const metadata = { title: "Settings · Job Tracker" };
@@ -33,6 +34,8 @@ export default function SettingsPage() {
       <Suspense fallback={<CardSkeleton lines={1} />}>
         <PasswordCardWrapper />
       </Suspense>
+
+      <ThemeCard />
 
       <AboutCard />
 

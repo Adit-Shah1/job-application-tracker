@@ -4,6 +4,7 @@ import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/ui/nav-link";
 import { MobileNav } from "@/components/ui/mobile-nav";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   LayoutDashboard,
   Briefcase,
@@ -71,7 +72,8 @@ export default async function AppLayout({
               Settings
             </NavLink>
           </nav>
-          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <div className="ml-auto flex items-center gap-1 sm:gap-2">
+            <ThemeToggle />
             <div className="hidden items-center gap-3 sm:flex">
               {session.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element

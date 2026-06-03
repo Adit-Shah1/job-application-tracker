@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   LayoutDashboard,
   Briefcase,
@@ -127,27 +128,30 @@ export function MobileNav({
             </nav>
 
             <div className="mt-auto border-t border-zinc-200/80 bg-zinc-50/80 p-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/60">
-              <div className="mb-2 flex items-center gap-2.5 rounded-md bg-white px-2.5 py-2 ring-1 ring-zinc-200/80 dark:bg-zinc-950 dark:ring-zinc-800">
-                {userImage ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={userImage}
-                    alt=""
-                    className="h-9 w-9 shrink-0 rounded-full ring-1 ring-zinc-200 dark:ring-zinc-800"
-                  />
-                ) : (
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 text-sm font-medium text-zinc-50 dark:from-zinc-200 dark:to-zinc-400 dark:text-zinc-900">
-                    {(userName ?? userEmail ?? "?").charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">
-                    {userName ?? userEmail ?? "—"}
-                  </p>
-                  {userName && userEmail && (
-                    <p className="truncate text-xs text-zinc-500">{userEmail}</p>
+              <div className="mb-2 flex items-center justify-between gap-2 rounded-md bg-white px-2.5 py-2 ring-1 ring-zinc-200/80 dark:bg-zinc-950 dark:ring-zinc-800">
+                <div className="flex items-center gap-2.5">
+                  {userImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={userImage}
+                      alt=""
+                      className="h-9 w-9 shrink-0 rounded-full ring-1 ring-zinc-200 dark:ring-zinc-800"
+                    />
+                  ) : (
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 text-sm font-medium text-zinc-50 dark:from-zinc-200 dark:to-zinc-400 dark:text-zinc-900">
+                      {(userName ?? userEmail ?? "?").charAt(0).toUpperCase()}
+                    </div>
                   )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">
+                      {userName ?? userEmail ?? "—"}
+                    </p>
+                    {userName && userEmail && (
+                      <p className="truncate text-xs text-zinc-500">{userEmail}</p>
+                    )}
+                  </div>
                 </div>
+                <ThemeToggle />
               </div>
               <form action={signOutAction}>
                 <button
