@@ -2,11 +2,12 @@ import { Suspense } from "react";
 import { ButtonLink } from "@/components/ui/button-link";
 import { listApplications, type ApplicationFilters } from "@/lib/actions/applications";
 import { ApplicationsTable, ApplicationsEmptyState } from "@/components/applications/ApplicationsTable";
+import { KanbanBoard } from "@/components/applications/KanbanBoard";
 import { ApplicationsFilterBar } from "@/components/applications/ApplicationsFilterBar";
 import { ExportCsvButton } from "@/components/applications/ExportCsvButton";
 import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, LayoutGrid, List } from "lucide-react";
 
 export const metadata = { title: "Applications · Job Tracker" };
 
@@ -16,6 +17,7 @@ type SearchParams = {
   search?: string;
   sort?: "recent" | "oldest" | "company" | "status";
   page?: string;
+  view?: string;
 };
 
 export default async function ApplicationsPage({
@@ -42,6 +44,7 @@ export default async function ApplicationsPage({
           </Suspense>
         </div>
         <div className="flex gap-2">
+          <ViewToggle currentView={params.view ?? "list"} />
           <ExportCsvButton />
           <ButtonLink href="/applications/new">
             <Plus size={15} /> New application
@@ -54,7 +57,7 @@ export default async function ApplicationsPage({
       </Suspense>
 
       <Suspense fallback={<ApplicationsTableFallback />}>
-        <ApplicationsList params={params} />
+        <ApplicationsList params={params} view={params.view ?? "list"} />
       </Suspense>
     </div>
   );
@@ -76,7 +79,13 @@ async function ApplicationsCount({ params }: { params: SearchParams }) {
   );
 }
 
-async function ApplicationsList({ params }: { params: SearchParams }) {
+async function ApplicationsList({ params, view }: { params: SearchParams; view: string }) {
+  if (view === "kanban") {
+    const result = await listApplications({ status: params.status, priority: params.priority, search: params.search, pageSize: 200 });
+    if (result.total === 0) return <ApplicationsEmptyState />;
+    return <KanbanBoard applications={result.data} />;
+  }
+
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
   const filters: ApplicationFilters = {
     status: params.status,
@@ -92,6 +101,36 @@ async function ApplicationsList({ params }: { params: SearchParams }) {
       <ApplicationsTable applications={result.data} />
       <Pagination currentPage={result.page} totalPages={result.totalPages} />
     </>
+  );
+}
+
+function ViewToggle({ currentView }: { currentView: string }) {
+  const isKanban = currentView === "kanban";
+  return (
+    <div className="inline-flex rounded-md border border-zinc-200/80 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+      <a
+        href="/applications"
+        className={`inline-flex h-8 w-8 items-center justify-center rounded-l-md transition-colors ${
+          !isKanban
+            ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
+            : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+        }`}
+        title="List view"
+      >
+        <List size={14} />
+      </a>
+      <a
+        href="/applications?view=kanban"
+        className={`inline-flex h-8 w-8 items-center justify-center rounded-r-md border-l border-zinc-200/80 transition-colors dark:border-zinc-800 ${
+          isKanban
+            ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
+            : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+        }`}
+        title="Kanban view"
+      >
+        <LayoutGrid size={14} />
+      </a>
+    </div>
   );
 }
 

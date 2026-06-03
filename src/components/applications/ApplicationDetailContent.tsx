@@ -15,6 +15,7 @@ import { RemindersList } from "@/components/reminders/RemindersList";
 import { DeleteApplicationButton } from "@/components/applications/DeleteApplicationButton";
 import { FollowUpButton } from "@/components/ai/FollowUpButton";
 import { AIInsightsButton } from "@/components/ai/AIInsightsButton";
+import { InterviewRounds } from "@/components/applications/InterviewRounds";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/dates";
 import { PRIORITY_LABELS } from "@/lib/constants";
@@ -172,6 +173,15 @@ export async function ApplicationDetailContent({
             <CardContent className="space-y-4">
               <ContactSection applicationId={app.id} contactName={contactName} contactEmail={contactEmail} contactPhone={contactPhone} />
               <ResumeSection applicationId={app.id} selectedResumeId={resumeVersionId} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle>Interview Rounds</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InterviewRounds applicationId={app.id} />
             </CardContent>
           </Card>
 
