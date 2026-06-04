@@ -56,7 +56,7 @@ type AppCard = {
 export function KanbanBoard({ applications }: { applications: AppCard[] }) {
   const router = useRouter();
   const { toast } = useToast();
-  const [pending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [dragId, setDragId] = useState<string | null>(null);
   const [overColumn, setOverColumn] = useState<ApplicationStatus | null>(null);
 

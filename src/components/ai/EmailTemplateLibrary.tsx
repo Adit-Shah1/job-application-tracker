@@ -13,7 +13,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Copy, Check, FileText, Send, Heart, XCircle, UserPlus } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
-import { cn } from "@/lib/utils";
 
 type Template = {
   id: string;

@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,7 +15,6 @@ import { useToast } from "@/components/ui/toast";
 import { Trash2, Loader2 } from "lucide-react";
 
 export function DeleteApplicationButton({ id }: { id: string }) {
-  const router = useRouter();
   const { toast } = useToast();
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);

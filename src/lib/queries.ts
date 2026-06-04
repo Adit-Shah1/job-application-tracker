@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
-import { startOfDay, addDays, differenceInDays } from "date-fns";
+import { startOfDay, addDays } from "date-fns";
 import {
   APPLICATION_STATUSES,
   type ApplicationStatus,

@@ -9,6 +9,7 @@ import { BulkApplicationsWrapper } from "@/components/applications/BulkApplicati
 import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, LayoutGrid, List } from "lucide-react";
+import Link from "next/link";
 
 export const metadata = { title: "Applications · Job Tracker" };
 
@@ -109,7 +110,7 @@ function ViewToggle({ currentView }: { currentView: string }) {
   const isKanban = currentView === "kanban";
   return (
     <div className="inline-flex rounded-md border border-zinc-200/80 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <a
+      <Link
         href="/applications"
         className={`inline-flex h-8 w-8 items-center justify-center rounded-l-md transition-colors ${
           !isKanban
@@ -119,8 +120,8 @@ function ViewToggle({ currentView }: { currentView: string }) {
         title="List view"
       >
         <List size={14} />
-      </a>
-      <a
+      </Link>
+      <Link
         href="/applications?view=kanban"
         className={`inline-flex h-8 w-8 items-center justify-center rounded-r-md border-l border-zinc-200/80 transition-colors dark:border-zinc-800 ${
           isKanban
@@ -130,7 +131,7 @@ function ViewToggle({ currentView }: { currentView: string }) {
         title="Kanban view"
       >
         <LayoutGrid size={14} />
-      </a>
+      </Link>
     </div>
   );
 }

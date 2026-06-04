@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/toast";
 import { Sparkles, Loader2, RefreshCcw, BookOpen, ArrowRight } from "lucide-react";
 
 type Tab = "summarize" | "next-steps";
@@ -59,7 +58,6 @@ function AIInsightsModal({
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
   const abortRef = useRef<AbortController | null>(null);
 
   async function generate(mode: Tab) {
@@ -102,6 +100,7 @@ function AIInsightsModal({
 
   // Generate on initial open and when tab changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     generate(tab);
     return () => abortRef.current?.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps

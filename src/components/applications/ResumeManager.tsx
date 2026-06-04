@@ -47,7 +47,7 @@ export function ResumeManager({
     });
   }, []);
 
-  const [createState, createAction, createPending] = useActionState<
+  const [, createAction, createPending] = useActionState<
     ActionResult | null,
     FormData
   >(

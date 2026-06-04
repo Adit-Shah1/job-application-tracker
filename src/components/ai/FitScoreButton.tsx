@@ -11,7 +11,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/toast";
 import { Target, Loader2, RefreshCcw, CheckCircle2, AlertTriangle, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -67,7 +66,6 @@ function FitScoreModal({
   const [result, setResult] = useState<FitScoreResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
   const abortRef = useRef<AbortController | null>(null);
 
   async function analyze() {

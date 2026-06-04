@@ -1,11 +1,10 @@
 import { Suspense } from "react";
-import { requireUser } from "@/lib/session";
 import { listApplications } from "@/lib/actions/applications";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/dates";
-import { APPLICATION_STATUSES, STATUS_LABELS, PRIORITY_LABELS } from "@/lib/constants";
+import { PRIORITY_LABELS } from "@/lib/constants";
 import {
   ArrowLeft,
   DollarSign,
@@ -15,7 +14,6 @@ import {
   ExternalLink,
   Briefcase,
 } from "lucide-react";
-import type { ApplicationStatus, Priority } from "@/generated/prisma/client";
 
 export const metadata = { title: "Compare Offers · Job Tracker" };
 

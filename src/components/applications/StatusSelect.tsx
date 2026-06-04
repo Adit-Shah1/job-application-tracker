@@ -48,6 +48,7 @@ export function StatusSelect({
   useEffect(() => {
     if (open) {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true);
       setClosing(false);
     } else if (visible) {

@@ -39,7 +39,6 @@ import {
   Users,
   Calendar,
   MessageSquare,
-  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InterviewQuestionsButton } from "@/components/ai/InterviewQuestionsButton";
@@ -67,7 +66,7 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
     });
   }, [applicationId]);
 
-  const [createState, createAction, createPending] = useActionState<ActionResult | null, FormData>(
+  const [, createAction, createPending] = useActionState<ActionResult | null, FormData>(
     async (_prev, formData) => {
       const res = await createInterviewRound(applicationId, null, formData);
       if (res.ok) {
@@ -305,6 +304,7 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
 
 function EditRoundForm({
   round,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   applicationId,
   onCancel,
   onSaved,
