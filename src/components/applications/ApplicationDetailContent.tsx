@@ -17,9 +17,9 @@ import { FollowUpButton } from "@/components/ai/FollowUpButton";
 import { AIInsightsButton } from "@/components/ai/AIInsightsButton";
 import { InterviewRounds } from "@/components/applications/InterviewRounds";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/dates";
+import { formatDate, daysBetween } from "@/lib/dates";
 import { PRIORITY_LABELS } from "@/lib/constants";
-import { ArrowLeft, ExternalLink, Pencil, MapPin, Briefcase, Calendar, DollarSign, Link2, Tag, Mail, Phone, User } from "lucide-react";
+import { ArrowLeft, ExternalLink, Pencil, MapPin, Briefcase, Calendar, DollarSign, Link2, Tag, Mail, Phone, User, Timer } from "lucide-react";
 
 export async function ApplicationDetailContent({
   id,
@@ -36,6 +36,12 @@ export async function ApplicationDetailContent({
   const contactPhone = p2Fields?.contactPhone ?? null;
   const coverLetter = p2Fields?.coverLetter ?? null;
   const resumeVersionId = p2Fields?.resumeVersionId ?? null;
+
+  // Time-to-response: days from dateSaved to first non-SAVED status change
+  const firstChange = app.statusChanges
+    .filter((sc) => sc.toStatus !== "SAVED")
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
+  const responseDays = firstChange ? daysBetween(app.dateSaved, firstChange.createdAt) : null;
 
   const salary =
     app.salaryMin || app.salaryMax
@@ -114,6 +120,13 @@ export async function ApplicationDetailContent({
                 label="Last updated"
                 value={formatDate(app.lastUpdated)}
               />
+              {responseDays !== null && (
+                <DetailRow
+                  icon={<Timer size={14} />}
+                  label="Response time"
+                  value={`${responseDays} day${responseDays === 1 ? "" : "s"}`}
+                />
+              )}
               {app.source && (
                 <DetailRow icon={<Tag size={14} />} label="Source" value={app.source} />
               )}

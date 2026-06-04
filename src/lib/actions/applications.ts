@@ -164,6 +164,59 @@ export async function updateApplicationStatus(
   return { ok: true };
 }
 
+export async function bulkUpdateStatus(
+  ids: string[],
+  status: string
+): Promise<ActionResult> {
+  const user = await requireUser();
+  const parsed = statusEnum.safeParse(status);
+  if (!parsed.success) {
+    return { ok: false, error: "Invalid status." };
+  }
+  const newStatus = parsed.data;
+
+  const apps = await prisma.application.findMany({
+    where: { id: { in: ids }, userId: user.id },
+    select: { id: true, status: true },
+  });
+  if (apps.length === 0) {
+    return { ok: false, error: "No applications found." };
+  }
+
+  const statusChanges = apps
+    .filter((app) => app.status !== newStatus)
+    .map((app) =>
+      prisma.statusChange.create({
+        data: { applicationId: app.id, fromStatus: app.status, toStatus: newStatus },
+      })
+    );
+
+  const appsNeedingDateApplied =
+    newStatus === "APPLIED" ? apps.filter((a) => a.status !== "APPLIED") : [];
+
+  await prisma.$transaction([
+    prisma.application.updateMany({
+      where: { id: { in: apps.map((a) => a.id) } },
+      data: { status: newStatus },
+    }),
+    ...(appsNeedingDateApplied.length > 0
+      ? [
+          prisma.application.updateMany({
+            where: { id: { in: appsNeedingDateApplied.map((a) => a.id) }, dateApplied: null },
+            data: { dateApplied: new Date() },
+          }),
+        ]
+      : []),
+    ...statusChanges,
+  ]);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/applications");
+  updateTag("dashboard");
+  updateTag("applications");
+  return { ok: true };
+}
+
 export async function deleteApplication(id: string): Promise<ActionResult> {
   const user = await requireUser();
   if (!(await assertOwnsApplication(id, user.id))) {

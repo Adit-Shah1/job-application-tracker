@@ -37,8 +37,8 @@ export function StatusChart({
   }
 
   return (
-    <div className="h-64 w-full min-w-0">
-      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={256} debounce={50}>
+    <div className="w-full min-w-0">
+      <ResponsiveContainer width="100%" height={256} minWidth={0} debounce={50}>
         <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
           <XAxis
             dataKey="name"

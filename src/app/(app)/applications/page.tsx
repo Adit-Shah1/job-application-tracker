@@ -5,6 +5,7 @@ import { ApplicationsTable, ApplicationsEmptyState } from "@/components/applicat
 import { KanbanBoard } from "@/components/applications/KanbanBoard";
 import { ApplicationsFilterBar } from "@/components/applications/ApplicationsFilterBar";
 import { ExportCsvButton } from "@/components/applications/ExportCsvButton";
+import { BulkApplicationsWrapper } from "@/components/applications/BulkApplicationsWrapper";
 import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, LayoutGrid, List } from "lucide-react";
@@ -97,10 +98,10 @@ async function ApplicationsList({ params, view }: { params: SearchParams; view: 
   const result = await listApplications(filters);
   if (result.total === 0) return <ApplicationsEmptyState />;
   return (
-    <>
+    <BulkApplicationsWrapper applicationIds={result.data.map((a) => a.id)}>
       <ApplicationsTable applications={result.data} />
       <Pagination currentPage={result.page} totalPages={result.totalPages} />
-    </>
+    </BulkApplicationsWrapper>
   );
 }
 

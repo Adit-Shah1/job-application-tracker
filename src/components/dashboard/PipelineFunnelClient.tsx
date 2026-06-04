@@ -1,14 +1,15 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { FunnelStage } from "@/lib/queries";
 
-const StatusChart = dynamic(
-  () => import("./StatusChart").then((m) => m.StatusChart),
+const PipelineFunnelChart = dynamic(
+  () => import("./PipelineFunnelChart").then((m) => m.PipelineFunnelChart),
   {
     ssr: false,
     loading: () => (
       <div className="flex h-[256px] items-end gap-3 px-2">
-        {[60, 90, 45, 75, 40, 55].map((h, i) => (
+        {[60, 80, 45, 25].map((h, i) => (
           <div
             key={i}
             className="skeleton h-full w-full rounded-md"
@@ -20,8 +21,6 @@ const StatusChart = dynamic(
   }
 );
 
-export function StatusChartClient(
-  props: React.ComponentProps<typeof StatusChart>
-) {
-  return <StatusChart {...props} />;
+export function PipelineFunnelClient({ data }: { data: FunnelStage[] }) {
+  return <PipelineFunnelChart data={data} />;
 }

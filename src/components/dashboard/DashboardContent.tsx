@@ -4,6 +4,7 @@ import { StatusBadge } from "@/components/applications/StatusBadge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { getDashboardSummary } from "@/lib/queries";
 import { StatusChartClient } from "./StatusChartClient";
+import { PipelineFunnelClient } from "./PipelineFunnelClient";
 import { fromNow, isOverdue, friendlyDate } from "@/lib/dates";
 import { REMINDER_TYPE_LABELS } from "@/lib/constants";
 import {
@@ -16,6 +17,7 @@ import {
   Bell,
   CheckCircle2,
   Sparkles,
+  Timer,
 } from "lucide-react";
 
 export async function DashboardContent() {
@@ -48,7 +50,7 @@ export async function DashboardContent() {
 
   return (
     <>
-      <div className="stagger grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="stagger grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
         <StatCard
           label="Total"
           value={summary.total}
@@ -73,6 +75,13 @@ export async function DashboardContent() {
           icon={<Trophy className="h-4 w-4" />}
           accent="from-emerald-500/10 to-emerald-500/0"
         />
+        <StatCard
+          label="Avg Response"
+          value={summary.avgResponseDays !== null ? summary.avgResponseDays : "—"}
+          suffix={summary.avgResponseDays !== null ? "days" : undefined}
+          icon={<Timer className="h-4 w-4" />}
+          accent="from-cyan-500/10 to-cyan-500/0"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -88,6 +97,20 @@ export async function DashboardContent() {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Pipeline funnel</CardTitle>
+            <CardDescription>
+              Conversion rates between stages.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PipelineFunnelClient data={summary.funnel} />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Upcoming reminders</CardTitle>
@@ -138,47 +161,47 @@ export async function DashboardContent() {
             )}
           </CardContent>
         </Card>
-      </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle>Recently updated</CardTitle>
-            <CardDescription>Your most recent activity.</CardDescription>
-          </div>
-          <ButtonLink href="/applications" variant="ghost" size="sm">
-            View all <ArrowRight size={14} />
-          </ButtonLink>
-        </CardHeader>
-        <CardContent>
-          <ul className="stagger divide-y divide-zinc-100 dark:divide-zinc-900">
-            {summary.recentlyUpdated.map((app) => (
-              <li
-                key={app.id}
-                className="group flex items-center justify-between py-2.5 text-sm"
-              >
-                <Link
-                  href={`/applications/${app.id}`}
-                  className="flex items-center gap-2 transition-colors hover:text-zinc-950 dark:hover:text-zinc-50"
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle>Recently updated</CardTitle>
+              <CardDescription>Your most recent activity.</CardDescription>
+            </div>
+            <ButtonLink href="/applications" variant="ghost" size="sm">
+              View all <ArrowRight size={14} />
+            </ButtonLink>
+          </CardHeader>
+          <CardContent>
+            <ul className="stagger divide-y divide-zinc-100 dark:divide-zinc-900">
+              {summary.recentlyUpdated.map((app) => (
+                <li
+                  key={app.id}
+                  className="group flex items-center justify-between py-2.5 text-sm"
                 >
-                  <CheckCircle2
-                    size={14}
-                    className="text-zinc-400"
-                  />
-                  <span className="font-medium">{app.companyName}</span>
-                  <span className="text-zinc-500">— {app.roleTitle}</span>
-                </Link>
-                <div className="flex items-center gap-3">
-                  <StatusBadge status={app.status} />
-                  <span className="hidden text-xs text-zinc-500 sm:inline">
-                    {fromNow(app.lastUpdated)}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
+                  <Link
+                    href={`/applications/${app.id}`}
+                    className="flex items-center gap-2 transition-colors hover:text-zinc-950 dark:hover:text-zinc-50"
+                  >
+                    <CheckCircle2
+                      size={14}
+                      className="text-zinc-400"
+                    />
+                    <span className="font-medium">{app.companyName}</span>
+                    <span className="text-zinc-500">— {app.roleTitle}</span>
+                  </Link>
+                  <div className="flex items-center gap-3">
+                    <StatusBadge status={app.status} />
+                    <span className="hidden text-xs text-zinc-500 sm:inline">
+                      {fromNow(app.lastUpdated)}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 }
@@ -188,11 +211,13 @@ function StatCard({
   value,
   icon,
   accent,
+  suffix,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   icon: React.ReactNode;
   accent: string;
+  suffix?: string;
 }) {
   return (
     <Card className="group relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-zinc-900/[0.04]">
@@ -207,7 +232,10 @@ function StatCard({
             {icon}
           </span>
         </div>
-        <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
+        <div className="mt-2 text-2xl font-semibold tabular-nums">
+          {value}
+          {suffix && <span className="ml-1 text-sm font-normal text-zinc-500">{suffix}</span>}
+        </div>
       </CardContent>
     </Card>
   );

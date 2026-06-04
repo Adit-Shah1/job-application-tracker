@@ -110,8 +110,8 @@ export function StatusSelect({
 
   const performChange = useCallback(
     (next: ApplicationStatus, previous: ApplicationStatus) => {
-      setOptimisticStatus(next);
       startTransition(async () => {
+        setOptimisticStatus(next);
         const res = await updateApplicationStatus(applicationId, next);
         if (!res.ok) {
           toast({

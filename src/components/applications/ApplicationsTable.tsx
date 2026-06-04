@@ -14,6 +14,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { formatDateShort } from "@/lib/dates";
 import { PRIORITY_LABELS } from "@/lib/constants";
 import { Briefcase, MapPin, Calendar, Plus, FileText, Bell } from "lucide-react";
+import { BulkCheckbox, BulkSelectAllCheckbox } from "./BulkApplicationsWrapper";
 import type { ApplicationStatus, Priority } from "@/generated/prisma/client";
 
 type ApplicationRow = {
@@ -43,6 +44,9 @@ export function ApplicationsTable({ applications }: { applications: ApplicationR
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <BulkSelectAllCheckbox total={applications.length} />
+                  </TableHead>
                   <TableHead>Company / Role</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Priority</TableHead>
@@ -54,6 +58,9 @@ export function ApplicationsTable({ applications }: { applications: ApplicationR
               <TableBody className="stagger">
                 {applications.map((app) => (
                   <TableRow key={app.id}>
+                    <TableCell>
+                      <BulkCheckbox id={app.id} />
+                    </TableCell>
                     <TableCell>
                       <Link
                         href={`/applications/${app.id}`}
@@ -104,6 +111,9 @@ export function ApplicationsTable({ applications }: { applications: ApplicationR
             className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-zinc-900/[0.04]"
           >
             <CardContent className="space-y-3 p-4">
+              <div className="flex items-center gap-2">
+                <BulkCheckbox id={app.id} />
+              </div>
               <div>
                 <Link
                   href={`/applications/${app.id}`}

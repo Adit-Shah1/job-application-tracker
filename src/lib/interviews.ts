@@ -8,6 +8,7 @@ export const interviewRoundSchema = z.object({
   scheduledAt: z.string().nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   feedback: z.string().max(5000).nullable().optional(),
+  debriefNotes: z.string().max(5000).nullable().optional(),
   outcome: z.enum(["PENDING", "PASSED", "FAILED", "NO_SHOW"]).nullable().optional(),
 });
 
@@ -24,6 +25,7 @@ export type InterviewRoundRow = {
   scheduledAt: Date | null;
   notes: string | null;
   feedback: string | null;
+  debriefNotes: string | null;
   outcome: string | null;
   createdAt: Date;
   updatedAt: Date;

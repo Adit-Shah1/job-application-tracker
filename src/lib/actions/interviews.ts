@@ -41,6 +41,7 @@ export async function createInterviewRound(
     scheduledAt: formData.get("scheduledAt") || null,
     notes: formData.get("notes") || null,
     feedback: formData.get("feedback") || null,
+    debriefNotes: formData.get("debriefNotes") || null,
     outcome: formData.get("outcome") || "PENDING",
   };
 
@@ -55,8 +56,8 @@ export async function createInterviewRound(
 
   const d = parsed.data;
   const rows = (await prisma.$queryRaw`
-    INSERT INTO "InterviewRound" ("applicationId", "roundNumber", "type", "interviewerName", "interviewerEmail", "scheduledAt", "notes", "feedback", "outcome")
-    VALUES (${applicationId}, ${d.roundNumber}, ${d.type}, ${d.interviewerName ?? null}, ${d.interviewerEmail ?? null}, ${d.scheduledAt ? new Date(d.scheduledAt) : null}, ${d.notes ?? null}, ${d.feedback ?? null}, ${d.outcome ?? "PENDING"})
+    INSERT INTO "InterviewRound" ("applicationId", "roundNumber", "type", "interviewerName", "interviewerEmail", "scheduledAt", "notes", "feedback", "debriefNotes", "outcome")
+    VALUES (${applicationId}, ${d.roundNumber}, ${d.type}, ${d.interviewerName ?? null}, ${d.interviewerEmail ?? null}, ${d.scheduledAt ? new Date(d.scheduledAt) : null}, ${d.notes ?? null}, ${d.feedback ?? null}, ${d.debriefNotes ?? null}, ${d.outcome ?? "PENDING"})
     RETURNING "id"
   `) as Array<{ id: string }>;
 
@@ -89,6 +90,7 @@ export async function updateInterviewRound(
     scheduledAt: formData.get("scheduledAt") || null,
     notes: formData.get("notes") || null,
     feedback: formData.get("feedback") || null,
+    debriefNotes: formData.get("debriefNotes") || null,
     outcome: formData.get("outcome") || "PENDING",
   };
 
@@ -107,7 +109,7 @@ export async function updateInterviewRound(
     SET "roundNumber" = ${d.roundNumber}, "type" = ${d.type},
         "interviewerName" = ${d.interviewerName ?? null}, "interviewerEmail" = ${d.interviewerEmail ?? null},
         "scheduledAt" = ${d.scheduledAt ? new Date(d.scheduledAt) : null},
-        "notes" = ${d.notes ?? null}, "feedback" = ${d.feedback ?? null}, "outcome" = ${d.outcome ?? "PENDING"},
+        "notes" = ${d.notes ?? null}, "feedback" = ${d.feedback ?? null}, "debriefNotes" = ${d.debriefNotes ?? null}, "outcome" = ${d.outcome ?? "PENDING"},
         "updatedAt" = NOW()
     WHERE "id" = ${roundId}
   `;

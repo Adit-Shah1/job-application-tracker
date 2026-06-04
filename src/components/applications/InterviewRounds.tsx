@@ -162,6 +162,11 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
               {round.feedback && (
                 <div className="mt-1 text-xs italic text-zinc-500">Feedback: {round.feedback}</div>
               )}
+              {round.debriefNotes && (
+                <div className="mt-2 rounded-md bg-amber-50 p-2 text-xs text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
+                  <span className="font-medium">Debrief:</span> {round.debriefNotes}
+                </div>
+              )}
             </div>
             <div className="flex gap-1">
               <button
@@ -244,6 +249,10 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
           <div className="space-y-1">
             <label className="text-xs text-zinc-500">Feedback</label>
             <Textarea name="feedback" rows={2} placeholder="How did it go?" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-zinc-500">Debrief Notes</label>
+            <Textarea name="debriefNotes" rows={2} placeholder="What went well? What to improve? Red flags?" />
           </div>
           <Button type="submit" size="sm" disabled={createPending} className="w-full">
             {createPending ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
@@ -356,6 +365,10 @@ function EditRoundForm({
       <div className="space-y-1">
         <label className="text-xs text-zinc-500">Feedback</label>
         <Textarea name="feedback" rows={2} defaultValue={round.feedback ?? ""} />
+      </div>
+      <div className="space-y-1">
+        <label className="text-xs text-zinc-500">Debrief Notes</label>
+        <Textarea name="debriefNotes" rows={2} defaultValue={round.debriefNotes ?? ""} />
       </div>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" size="sm" onClick={onCancel}>

@@ -37,3 +37,14 @@ export function isOverdue(date: Date | string | null | undefined) {
   const d = typeof date === "string" ? new Date(date) : date;
   return isPast(d) && !isToday(d);
 }
+
+export function daysBetween(
+  a: Date | string | null | undefined,
+  b: Date | string | null | undefined
+): number | null {
+  if (!a || !b) return null;
+  const dA = typeof a === "string" ? new Date(a) : a;
+  const dB = typeof b === "string" ? new Date(b) : b;
+  const diffMs = dB.getTime() - dA.getTime();
+  return Math.round(diffMs / (1000 * 60 * 60 * 24));
+}
