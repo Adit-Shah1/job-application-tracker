@@ -15,6 +15,8 @@ import { RemindersList } from "@/components/reminders/RemindersList";
 import { DeleteApplicationButton } from "@/components/applications/DeleteApplicationButton";
 import { FollowUpButton } from "@/components/ai/FollowUpButton";
 import { AIInsightsButton } from "@/components/ai/AIInsightsButton";
+import { FitScoreButton } from "@/components/ai/FitScoreButton";
+import { EmailTemplateLibrary } from "@/components/ai/EmailTemplateLibrary";
 import { InterviewRounds } from "@/components/applications/InterviewRounds";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, daysBetween } from "@/lib/dates";
@@ -79,6 +81,11 @@ export async function ApplicationDetailContent({
             </div>
           </div>
           <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:flex-shrink-0">
+            <FitScoreButton
+              applicationId={app.id}
+              companyName={app.companyName}
+              roleTitle={app.roleTitle}
+            />
             <AIInsightsButton
               applicationId={app.id}
               companyName={app.companyName}
@@ -251,6 +258,11 @@ export async function ApplicationDetailContent({
                   tone: d.tone,
                   updatedAt: d.updatedAt,
                 }))}
+              />
+              <EmailTemplateLibrary
+                companyName={app.companyName}
+                roleTitle={app.roleTitle}
+                contactName={contactName ?? undefined}
               />
             </CardHeader>
             <CardContent>

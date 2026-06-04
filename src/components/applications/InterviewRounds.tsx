@@ -42,6 +42,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { InterviewQuestionsButton } from "@/components/ai/InterviewQuestionsButton";
 
 
 
@@ -169,6 +170,11 @@ export function InterviewRounds({ applicationId }: { applicationId: string }) {
               )}
             </div>
             <div className="flex gap-1">
+              <InterviewQuestionsButton
+                applicationId={applicationId}
+                roundType={round.type}
+                roundNumber={round.roundNumber}
+              />
               <button
                 type="button"
                 onClick={() => setEditingId(editingId === round.id ? null : round.id)}

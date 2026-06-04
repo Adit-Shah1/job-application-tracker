@@ -1,8 +1,6 @@
 # Job Application Tracker
 
-A full-stack web app to track job applications from first save to final outcome. Built with Next.js 16, Prisma, Neon Postgres, Auth.js, and Google Gemini for AI-powered features.
-
-> Built from the spec in [SPEC.md](./SPEC.md). Goes well beyond the MVP with 20+ features including Kanban board, interview prep tracker, offer comparison, AI insights, bulk actions, and more.
+An open-source job search management platform. Track applications from first save to final outcome with AI-powered insights, Kanban board, interview prep, and analytics — all in one place.
 
 <p>
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" />
@@ -14,79 +12,85 @@ A full-stack web app to track job applications from first save to final outcome.
   <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind-4-38bdf8?logo=tailwindcss" />
   <img alt="Gemini" src="https://img.shields.io/badge/Gemini-2.5_Flash-4285f4?logo=google" />
   <img alt="CI" src="https://img.shields.io/badge/CI-GitHub_Actions-2088ff?logo=githubactions" />
-  <img alt="Deployed on Vercel" src="https://img.shields.io/badge/Vercel-deployed-000?logo=vercel" />
+  <img alt="Vercel" src="https://img.shields.io/badge/Vercel-deployed-000?logo=vercel" />
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green" />
 </p>
 
-**[Try the live demo →](https://job-application-tracker-one-ochre.vercel.app/)** &nbsp;·&nbsp; Sign in with GitHub or Google to see the full flow.
+**[App →](https://job-application-tracker-one-ochre.vercel.app/)** &nbsp;·&nbsp; [Report a bug](https://github.com/Adit-Shah1/job-application-tracker/issues) &nbsp;·&nbsp; [Request a feature](https://github.com/Adit-Shah1/job-application-tracker/issues)
+
+---
+
+## Why this exists
+
+Job seekers juggle dozens of applications across multiple platforms, stages, and timelines. Spreadsheets break down fast. This app replaces that chaos with a structured, searchable, AI-assisted workflow — one place to manage everything about your job search.
 
 ---
 
 ## Features
 
-### Core
+### Application Management
 
-- **Authentication** — GitHub or Google via [Auth.js v5](https://authjs.dev/), email/password, database sessions, Prisma adapter
-- **Application management** — full CRUD with company, role, URL, location, salary range, currency, status, priority, source
-- **Status pipeline** — Saved → Applied → Interviewing → Offer → Rejected → Archived, with optimistic one-click changes and 5-second undo
-- **Notes** — full CRUD with optimistic updates, inline edit, timestamps, and search across note content
-- **Reminders** — Follow-up / Interview / Deadline / Other, with optimistic updates, completion tracking, and overdue highlighting
-- **Contact & recruiter management** — store recruiter name, email, and phone per application
-- **Cover letter storage** — per-application cover letter editor with AI generation
-- **Resume version management** — upload and tag resume versions to applications
+- **Full CRUD** — company, role, URL, location, salary range, currency, status, priority, source
+- **Status pipeline** — Saved → Applied → Interviewing → Offer → Rejected → Archived, with one-click changes, optimistic UI, and 5-second undo
+- **Notes** — full CRUD with optimistic updates, inline editing, and full-text search across note content
+- **Reminders** — Follow-up / Interview / Deadline / Other, with completion tracking and overdue highlighting
+- **Contacts** — recruiter name, email, and phone per application
+- **Cover letters** — per-application editor with AI generation
+- **Resume versions** — upload and tag resume versions to applications
+- **CSV export** — download all applications
 
-### Dashboard & Analytics
+### Views
 
-- **Dashboard** — 5 stat cards (total, active, interviewing, offers, avg response time), status distribution chart, pipeline funnel chart, upcoming reminders, recently updated activity
-- **Pipeline funnel chart** — conversion rates between stages (Saved → Applied → Interviewing → Offer) using Recharts
-- **Time-to-response tracking** — days from save to first status change, displayed per application and as a dashboard average
-- **Status change timeline** — visual activity log on each application showing every status transition with timestamps
-- **CSV export** — download all applications as a CSV file
+- **List view** — sortable, searchable table with pagination, status/priority filters
+- **Kanban board** — drag-and-drop columns per status, responsive grid (1 → 2 → 3 → 6 columns by breakpoint)
+- **Bulk actions** — select multiple applications with checkboxes, change status in batch
+- **Offer comparison** — side-by-side table comparing salary, location, and role for offer-stage applications
 
-### Views & Navigation
+### Analytics
 
-- **List view** — sortable, searchable table with pagination, status and priority filters
-- **Kanban board** — drag-and-drop columns per status using native HTML5 DnD, responsive grid layout (1 col mobile → 2 sm → 3 lg → 6 xl)
-- **List/Kanban toggle** — switch between views on the applications page
-- **Bulk status update** — select multiple applications with checkboxes and change status in batch via a floating action bar
-- **Pagination** — URL-based page params with skip/take and page controls
-- **Search & filter** — full-text search across company, role, location, and note content; status and priority filters; multiple sort options
+- **Dashboard** — 5 stat cards (total, active, interviewing, offers, avg response time), status chart, pipeline funnel, upcoming reminders, recent activity
+- **Pipeline funnel** — conversion rates between stages (Saved → Applied → Interviewing → Offer)
+- **Response time tracking** — days from save to first status change, per application and as a dashboard average
+- **Status timeline** — visual activity log of every status transition with timestamps
 
-### Interview & Offer Tools
+### Interview Prep
 
-- **Interview prep tracker** — structured interview rounds with round number, type (phone screen, technical, behavioral, system design, onsite, final), interviewer details, scheduled date, notes, feedback, outcome, and debrief notes
-- **Offer comparison page** — side-by-side comparison table for OFFER-status applications (salary, location, company, role)
-- **Interview debrief notes** — structured reflection after each round (what went well, what to improve, red flags)
+- **Interview rounds** — structured tracking with round number, type (phone screen, technical, behavioral, system design, onsite, final), interviewer details, scheduled date, notes, feedback, outcome
+- **Debrief notes** — structured reflection after each round
+- **AI question generator** — generates likely interview questions based on role, company, and round type
 
 ### AI Features
 
-- **AI follow-up email** — drafts a personalized follow-up with Google Gemini 2.5 Flash, with tone selector and token-by-token streaming
-- **AI note summarization** — summarizes all notes for an application into key takeaways
-- **AI next-step suggestions** — suggests what to do next based on application status and context
-- **Tabbed AI insights dialog** — all AI features accessible from a single button on the detail page
+All AI features use Google Gemini 2.5 Flash. Each endpoint has per-user rate limiting. AI buttons are hidden if `GEMINI_API_KEY` is not configured — the rest of the app works fully without it.
 
-### UI & UX
+- **Resume ↔ Job Fit Score** — paste a job description, get a 0–100 match score with strengths, gaps, and actionable suggestions
+- **Cover letter generator** — generate a tailored cover letter from a job description, stream it into the editor, and save
+- **Follow-up email drafts** — AI-drafted follow-ups with tone selector (professional/friendly), streaming, save, and copy
+- **Email template library** — pre-written templates (follow-up, thank-you, withdrawal, recruiter outreach) with auto-filled variables
+- **Note summarization** — summarizes all notes into key takeaways
+- **Next-step suggestions** — recommends what to do next based on application status and context
 
-- **Dark mode** — manual light/dark toggle with system preference fallback, persisted to localStorage, class-based strategy
-- **Keyboard shortcuts** — nav (1-3), new application (n), search (/), Escape for dialogs
-- **Custom status dropdown** — portal-based popover with smooth open/close animations, escapes parent overflow
-- **Custom delete dialogs** — confirmation Dialog component replaces browser `confirm()` throughout the app
-- **Inline editing** — edit fields directly on the detail page without navigating to a separate edit page
-- **Responsive design** — table view on desktop, card view on mobile
-- **Loading states** — shimmer skeletons for slow queries
-- **Animations** — page fade-up, staggered list items, smooth status transitions, dialog scale-in/out, toast slide-in
+### Design & UX
+
+- **Dark mode** — manual light/dark toggle with system preference fallback
+- **Keyboard shortcuts** — navigation (1–3), new application (n), search (/), Escape for dialogs
+- **Custom components** — portal-based status dropdown, dialog-based delete confirmations, inline editing
+- **Responsive** — table on desktop, cards on mobile, adaptive Kanban grid
+- **Animations** — page fade-up, staggered lists, smooth transitions, dialog scale-in/out, toast slide-in
+- **Loading states** — shimmer skeletons for async operations
 - **Accessible** — semantic HTML, ARIA labels, focus-visible rings, `prefers-reduced-motion` respected
 
 ### Engineering
 
-- **CI/CD pipeline** — GitHub Actions workflow with lint → typecheck → build on every push/PR
-- **Optimistic updates** — notes, reminders, and status changes appear/disappear instantly via `useOptimistic`
+- **CI/CD** — GitHub Actions with lint → typecheck → build on every push/PR
+- **Optimistic updates** — notes, reminders, and status changes feel instant via `useOptimistic`
 - **Input validation** — Zod schemas on all forms, server-side validation on all actions
 - **Ownership enforcement** — every query and action verifies the user owns the resource
-- **Rate limiting** — per-user rate limiter on AI endpoints to prevent abuse
+- **Rate limiting** — per-user rate limiter on AI endpoints
 
 ---
 
-## Quick start
+## Quick Start
 
 ### Prerequisites
 
@@ -109,8 +113,6 @@ npm install
 cp .env.example .env
 ```
 
-Fill in `.env`:
-
 | Variable | Where to get it |
 |---|---|
 | `DATABASE_URL` | Neon project → connection string (pooled, with `?sslmode=require`) |
@@ -119,13 +121,11 @@ Fill in `.env`:
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | [Google Cloud Console](https://console.cloud.google.com/apis/credentials) |
 | `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) (free) |
 
-See [OAuth setup details](#oauth-setup-details) below for step-by-step instructions.
-
 ### 3. Set up the database
 
 ```bash
 npm run db:push       # apply schema to your database
-npm run db:seed       # optional: seed 12 demo applications
+npm run db:seed       # optional: seed sample applications
 ```
 
 ### 4. Run
@@ -134,53 +134,42 @@ npm run db:seed       # optional: seed 12 demo applications
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and sign in.
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## OAuth setup details
+## OAuth Setup
 
-The most common "sign-in doesn't work" issue is a missing or misconfigured OAuth credential. Here's a checklist.
+### Google
 
-### Google Cloud Console (for Google sign-in)
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a project → configure the OAuth consent screen (External, add `email`/`profile`/`openid` scopes)
+3. Create OAuth client ID (Web application):
+   - Authorized JavaScript origins: `http://localhost:3000`
+   - Authorized redirect URIs: `http://localhost:3000/api/auth/callback/google`
+4. Copy Client ID and Client Secret into `.env`
 
-1. https://console.cloud.google.com/apis/credentials
-2. **Create a project** (or pick an existing one).
-3. **Configure the OAuth consent screen** (left sidebar → "OAuth consent screen"):
-   - User type: **External** (unless you have a Google Workspace org)
-   - Fill in app name, support email, developer email
-   - Add the scopes: `email`, `profile`, `openid` (the defaults Auth.js requests)
-   - If the app is in "Testing" mode, add your email under "Test users"
-4. **Create OAuth client ID** (Credentials → Create Credentials → OAuth client ID):
-   - Application type: **Web application**
-   - Name: anything (e.g. "Job Tracker Dev")
-   - **Authorized JavaScript origins**: `http://localhost:3000`
-   - **Authorized redirect URIs** (must match exactly — no trailing slash):
-     - `http://localhost:3000/api/auth/callback/google`
-   - Click Create, then copy the Client ID and Client Secret into `.env`
-5. **Restart `npm run dev`** so it picks up the new env vars.
+> **Production:** add your production URL to both origins and redirect URIs. Set `AUTH_URL` to the production URL in your hosting provider's env.
 
-> **For production:** add your production URL to both JavaScript origins and redirect URIs (e.g. `https://your-app.vercel.app/api/auth/callback/google`) and set `AUTH_URL` in your Vercel env to the production URL.
+### GitHub
 
-### GitHub (for GitHub sign-in)
-
-1. https://github.com/settings/developers → New OAuth App
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers) → New OAuth App
 2. Homepage URL: `http://localhost:3000`
 3. Authorization callback URL: `http://localhost:3000/api/auth/callback/github`
-4. Copy Client ID → `AUTH_GITHUB_ID`, generate a client secret → `AUTH_GITHUB_SECRET`
+4. Copy Client ID → `AUTH_GITHUB_ID`, generate secret → `AUTH_GITHUB_SECRET`
 
-### Common errors
+### Troubleshooting
 
 | Error | Cause |
 |---|---|
-| `Missing required parameter: client_id` | `AUTH_GOOGLE_ID` is empty in `.env`, or you didn't restart the dev server after editing `.env` |
-| `redirect_uri_mismatch` | The redirect URI in Google Cloud Console doesn't match `http://localhost:3000/api/auth/callback/google` exactly |
-| `Access blocked: this app's request is invalid` | OAuth consent screen not configured, or your email isn't on the test users list |
-| `OAuthAccountNotLinked` | You previously signed in with a different provider using the same email. Sign in with the other provider once. |
+| `Missing required parameter: client_id` | `AUTH_GOOGLE_ID` is empty, or you didn't restart the dev server |
+| `redirect_uri_mismatch` | Redirect URI doesn't match exactly (no trailing slash) |
+| `Access blocked` | OAuth consent screen not configured, or your email isn't on the test users list |
+| `OAuthAccountNotLinked` | Previously signed in with a different provider using the same email |
 
 ---
 
-## Tech stack
+## Tech Stack
 
 | Layer | Choice |
 |---|---|
@@ -193,97 +182,58 @@ The most common "sign-in doesn't work" issue is a missing or misconfigured OAuth
 | Validation | [Zod](https://zod.dev/) |
 | Forms | React Server Actions + `useActionState` + `useOptimistic` |
 | Charts | [Recharts](https://recharts.org/) |
-| AI | [Google Gemini 2.5 Flash](https://aistudio.google.com/) (free tier) via `@google/generative-ai` |
+| AI | [Google Gemini 2.5 Flash](https://aistudio.google.com/) via `@google/generative-ai` |
 | Icons | [Lucide](https://lucide.dev/) |
 | CI/CD | [GitHub Actions](https://github.com/features/actions) |
 | Deployment | [Vercel](https://vercel.com/) + Neon |
 
 ---
 
-## Project layout
+## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── (app)/                    # Authenticated routes (protected layout)
-│   │   ├── dashboard/            # Stats + charts + reminders + activity
+│   ├── (app)/                    # Authenticated routes
+│   │   ├── dashboard/            # Stats, charts, reminders, activity
 │   │   ├── applications/
-│   │   │   ├── page.tsx          # List + Kanban views with bulk actions
-│   │   │   ├── new/page.tsx      # Create form
-│   │   │   ├── [id]/page.tsx     # Detail view (notes, reminders, contacts,
-│   │   │   │                     #   resume, cover letter, interview rounds,
-│   │   │   │                     #   AI insights, inline editing, timeline)
-│   │   │   ├── [id]/edit/page.tsx
-│   │   │   └── compare/page.tsx  # Offer comparison table
-│   │   ├── settings/             # Theme, OAuth providers, account
-│   │   ├── layout.tsx            # Top nav, sign-out, keyboard shortcuts
-│   │   ├── loading.tsx           # Shimmer skeleton
-│   │   ├── error.tsx             # Error boundary
-│   │   └── not-found.tsx
-│   ├── (public)/
-│   │   ├── signin/               # OAuth + email/password sign-in
-│   │   └── goodbye/
+│   │   │   ├── page.tsx          # List + Kanban views, bulk actions
+│   │   │   ├── new/              # Create form
+│   │   │   ├── [id]/             # Detail, edit
+│   │   │   └── compare/          # Offer comparison
+│   │   └── settings/             # Theme, providers, account
+│   ├── (public)/signin/          # Sign-in page
 │   ├── api/
 │   │   ├── auth/[...nextauth]/   # Auth.js handlers
-│   │   └── ai/
-│   │       ├── follow-up/        # Streaming follow-up email endpoint
-│   │       ├── summarize/        # AI note summarization
-│   │       └── next-steps/       # AI next-step suggestions
-│   ├── layout.tsx
-│   ├── globals.css               # Animations + ambient background
-│   └── page.tsx                  # Root redirect
+│   │   └── ai/                   # AI endpoints (follow-up, summarize,
+│   │                             #   next-steps, fit-score, cover-letter,
+│   │                             #   interview-questions)
+│   └── globals.css               # Animations, ambient background
 ├── components/
 │   ├── ui/                       # Button, Card, Dialog, Toast, Select, etc.
-│   ├── applications/
-│   │   ├── ApplicationsTable.tsx # Responsive table with bulk checkboxes
-│   │   ├── KanbanBoard.tsx       # Drag-and-drop status columns
-│   │   ├── StatusSelect.tsx      # Portal-based custom dropdown
-│   │   ├── StatusBadge.tsx
-│   │   ├── StatusTimeline.tsx    # Activity log
-│   │   ├── InterviewRounds.tsx   # Interview prep CRUD
-│   │   ├── InlineEditFields.tsx
-│   │   ├── ContactSection.tsx
-│   │   ├── CoverLetterSection.tsx
-│   │   ├── ResumeSection.tsx / ResumeManager.tsx
-│   │   ├── BulkActionBar.tsx     # Floating bulk status update bar
-│   │   ├── BulkApplicationsWrapper.tsx
-│   │   └── DeleteApplicationButton.tsx
-│   ├── notes/NotesList.tsx
-│   ├── reminders/RemindersList.tsx
-│   ├── dashboard/
-│   │   ├── StatusChart.tsx       # Status distribution bar chart
-│   │   ├── PipelineFunnelChart.tsx  # Conversion rate funnel
-│   │   └── DashboardContent.tsx
-│   └── ai/
-│       ├── FollowUpButton.tsx    # Streaming email draft modal
-│       └── AIInsightsButton.tsx  # Tabbed summarize/next-steps dialog
+│   ├── applications/             # Table, Kanban, StatusSelect, InterviewRounds,
+│   │                             #   Contacts, CoverLetter, Resume, BulkActions
+│   ├── dashboard/                # StatusChart, PipelineFunnelChart
+│   ├── ai/                       # FollowUpButton, AIInsightsButton,
+│   │                             #   FitScoreButton, EmailTemplateLibrary,
+│   │                             #   InterviewQuestionsButton
+│   ├── notes/
+│   └── reminders/
 ├── lib/
-│   ├── actions/
-│   │   ├── applications.ts       # CRUD, bulk update, list, CSV export
-│   │   ├── notes.ts
-│   │   ├── reminders.ts
-│   │   ├── interviews.ts         # Interview round CRUD (raw SQL)
-│   │   ├── resumes.ts            # Resume, contact, cover letter actions
-│   │   ├── email-drafts.ts
-│   │   ├── ownership.ts          # Shared ownership assertion
-│   │   └── export.ts             # CSV export action
-│   ├── interviews.ts             # Interview types, schema, constants
-│   ├── auth.ts                   # Auth.js config
-│   ├── db.ts                     # Prisma client (with driver adapter)
-│   ├── gemini.ts                 # Gemini client + rate limiter
-│   ├── queries.ts                # Dashboard / detail / funnel queries
+│   ├── actions/                  # Server actions (applications, notes,
+│   │                             #   reminders, interviews, resumes, etc.)
+│   ├── queries.ts                # Dashboard, detail, funnel queries
+│   ├── auth.ts, db.ts, gemini.ts # Core infrastructure
 │   ├── validation.ts             # Zod schemas
-│   ├── constants.ts              # Status / priority enums + labels
-│   ├── dates.ts                  # date-fns helpers (including daysBetween)
-│   ├── session.ts                # requireUser helper
-│   ├── utils.ts                  # cn() utility
-│   └── types.ts                  # Raw SQL type extensions
+│   ├── constants.ts, dates.ts    # Shared utilities
+│   └── interviews.ts             # Interview types and schema
 ├── providers/theme-provider.tsx
 prisma/
-├── schema.prisma
-├── seed.ts
-└── config.ts
-.github/workflows/ci.yml          # Lint → typecheck → build
+├── schema.prisma                 # Database schema
+└── seed.ts                       # Sample data
+.github/workflows/ci.yml          # CI pipeline
+e2e/app.spec.ts                   # Playwright E2E tests
+playwright.config.ts              # Playwright config
 ```
 
 ---
@@ -297,14 +247,15 @@ prisma/
 | `npm start` | Run production build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript check (`tsc --noEmit`) |
+| `npm run test:e2e` | Playwright E2E tests |
 | `npm run db:push` | Push schema to the database |
 | `npm run db:migrate` | Create and apply a migration |
-| `npm run db:seed` | Seed demo data |
+| `npm run db:seed` | Seed sample data |
 | `npm run db:studio` | Open Prisma Studio |
 
 ---
 
-## Data model
+## Data Model
 
 ```
 User ─┬─ Account (Auth.js OAuth)
@@ -313,82 +264,53 @@ User ─┬─ Account (Auth.js OAuth)
       │               ├─ Reminder
       │               ├─ EmailDraft
       │               ├─ StatusChange (audit log)
-      │               └─ InterviewRound (raw SQL)
+      │               └─ InterviewRound
       └─ ResumeVersion
 ```
 
-- `Application.status`: `SAVED` → `APPLIED` → `INTERVIEWING` → `OFFER` | `REJECTED` | `ARCHIVED`
-- `Application.priority`: `LOW` | `MEDIUM` | `HIGH`
-- `Reminder.reminderType`: `FOLLOW_UP` | `INTERVIEW` | `DEADLINE` | `OTHER`
-- `InterviewRound.type`: `PHONE_SCREEN` | `TECHNICAL` | `BEHAVIORAL` | `SYSTEM_DESIGN` | `ONSITE` | `FINAL` | `OTHER`
-- `InterviewRound.outcome`: `PENDING` | `PASSED` | `FAILED` | `NO_SHOW`
+**Status flow:** `SAVED` → `APPLIED` → `INTERVIEWING` → `OFFER` | `REJECTED` | `ARCHIVED`
 
-All entity ownership is enforced at the action layer — no application, note, or reminder is ever returned to a user other than its owner.
+**Priority:** `LOW` | `MEDIUM` | `HIGH`
 
----
+**Reminder types:** `FOLLOW_UP` | `INTERVIEW` | `DEADLINE` | `OTHER`
 
-## AI features
+**Interview types:** `PHONE_SCREEN` | `TECHNICAL` | `BEHAVIORAL` | `SYSTEM_DESIGN` | `ONSITE` | `FINAL` | `OTHER`
 
-All AI features use `gemini-2.5-flash` (free tier: 15 RPM, 1M TPM). Each endpoint has a per-user rate limit.
+**Outcomes:** `PENDING` | `PASSED` | `FAILED` | `NO_SHOW`
 
-### Follow-up email draft
-- Prompt includes company, role, status, date applied, and the 5 most recent notes.
-- Tone selector: `professional` (default) or `friendly`.
-- Response is streamed to the client and rendered token-by-token.
-
-### Note summarization
-- Summarizes all notes for an application into key takeaways.
-- Useful for refreshing context before an interview or follow-up.
-
-### Next-step suggestions
-- Analyzes the application's current status and context.
-- Suggests actionable next steps (e.g., "Send a follow-up email", "Prepare for system design round").
-
-All AI buttons are hidden if `GEMINI_API_KEY` is not set, so the rest of the app works without AI.
+All entity ownership is enforced server-side — no data is ever returned to a user other than its owner.
 
 ---
 
 ## Deployment
 
-1. Push the repo to GitHub.
-2. Create a Vercel project and import the repo.
-3. Add all the env vars from `.env.example` to the Vercel project settings.
+1. Push to GitHub.
+2. Create a [Vercel](https://vercel.com) project and import the repo.
+3. Add all env vars from `.env` to the Vercel project settings.
 4. Set `AUTH_URL` to your production URL.
-5. Add the production callback URLs to your OAuth apps:
+5. Add production callback URLs to your OAuth apps:
    - `https://your-app.vercel.app/api/auth/callback/github`
    - `https://your-app.vercel.app/api/auth/callback/google`
 6. Deploy.
 
-> Vercel will run `prisma generate` during build. If you use Neon, set `DATABASE_URL` to the **pooled** connection string and consider adding a separate `DIRECT_URL` for migrations.
+> If you use Neon, set `DATABASE_URL` to the **pooled** connection string and add a separate `DIRECT_URL` for migrations.
 
 ---
 
-## CI/CD
+## Contributing
 
-The project includes a GitHub Actions workflow (`.github/workflows/ci.yml`) that runs on every push and PR:
+Contributions are welcome. Open an issue to discuss what you'd like to change, then submit a pull request.
 
-1. **Lint** — ESLint
-2. **Typecheck** — `tsc --noEmit`
-3. **Build** — `prisma generate && next build`
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Commit your changes
+4. Push to the branch (`git push origin feature/my-feature`)
+5. Open a pull request
 
----
-
-## Notes on polish
-
-This isn't a tutorial clone. A few details that were intentional:
-
-- **Animations** use CSS keyframes (no animation library) and respect `prefers-reduced-motion`.
-- **Ambient background** is a fixed gradient mesh that adapts to light/dark mode.
-- **Empty states** have gradient hero illustrations rather than dead-end messages.
-- **Stat cards** have hover lift and unique color accents per metric.
-- **Status select** is a portal-based custom dropdown with smooth scale-in/out animations and a colored status dot that pulses softly while saving.
-- **Form inputs** have a focus state that lifts the border and adds a soft ring + shadow.
-- **Loading skeletons** use a moving shimmer gradient, not a flat pulse.
-- **Delete confirmations** use custom Dialog components instead of browser `confirm()`.
-- **Kanban board** uses a responsive CSS grid that adapts columns per breakpoint (no horizontal scrolling).
+Please make sure `npm run lint` and `npm run typecheck` pass before submitting.
 
 ---
 
 ## License
 
-MIT
+[MIT](./LICENSE)
