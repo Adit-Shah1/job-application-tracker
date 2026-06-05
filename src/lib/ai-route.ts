@@ -29,7 +29,11 @@ export function createAiRoute<T extends z.ZodType>(
   schema: T,
   routeName: string,
   handler: (ctx: AiHandlerContext<z.infer<T>>) => Promise<Response>,
-  options?: { formatError?: (message: string) => string },
+  options?: {
+    formatError?: (message: string) => string;
+    /** Override the default take:5 for notes included in the app lookup. */
+    notesTake?: number;
+  },
 ) {
   return {
     async POST(req: NextRequest): Promise<Response> {
@@ -47,7 +51,7 @@ export function createAiRoute<T extends z.ZodType>(
       const { applicationId } = parsed.data as { applicationId: string };
       const app = await prisma.application.findUnique({
         where: { id: applicationId },
-        include: { notes: { orderBy: { createdAt: "desc" }, take: 5 } },
+        include: { notes: { orderBy: { createdAt: "desc" }, take: options?.notesTake ?? 5 } },
       });
       if (!app || app.userId !== session.user.id) {
         return new Response("Not found", { status: 404 });
@@ -122,8 +126,8 @@ export function streamResponse(
   });
 }
 
-/** Format application notes into a numbered list. */
-export function formatNotes(notes: { content: string }[]): string {
+/** Format application notes into a numbered list with dates. */
+export function formatNotes(notes: { content: string; createdAt: Date }[]): string {
   if (!notes.length) return "No notes recorded yet.";
-  return notes.map((n, i) => `Note ${i + 1}: ${n.content}`).join("\n");
+  return notes.map((n, i) => `Note ${i + 1} (${n.createdAt.toISOString().slice(0, 10)}): ${n.content}`).join("\n");
 }

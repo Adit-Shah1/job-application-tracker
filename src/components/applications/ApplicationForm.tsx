@@ -12,13 +12,15 @@ import {
   PRIORITIES,
   PRIORITY_LABELS,
   STATUS_LABELS,
+  type ApplicationStatus,
+  type Priority,
 } from "@/lib/constants";
 import {
   createApplication,
   updateApplication,
   type ActionResult,
 } from "@/lib/actions/applications";
-import type { Application, ApplicationStatus, Priority } from "@/generated/prisma/client";
+import type { Application } from "@/generated/prisma/client";
 import { useToast } from "@/components/ui/toast";
 
 type Mode = "create" | "edit";
@@ -26,9 +28,24 @@ type Mode = "create" | "edit";
 export function ApplicationForm({
   mode,
   application,
+  initialValues,
 }: {
   mode: Mode;
   application?: Application;
+  /** Pre-fill values from URL search params (e.g. bookmarklet). */
+  initialValues?: Partial<{
+    companyName: string;
+    roleTitle: string;
+    jobUrl: string;
+    location: string;
+    status: string;
+    salaryMin: string;
+    salaryMax: string;
+    currency: string;
+    dateApplied: string;
+    priority: string;
+    source: string;
+  }>;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -68,19 +85,19 @@ export function ApplicationForm({
     priority: Priority;
     source: string;
   } = {
-    companyName: application?.companyName ?? "",
-    roleTitle: application?.roleTitle ?? "",
-    jobUrl: application?.jobUrl ?? "",
-    location: application?.location ?? "",
-    status: application?.status ?? "SAVED",
-    salaryMin: application?.salaryMin != null ? String(application.salaryMin) : "",
-    salaryMax: application?.salaryMax != null ? String(application.salaryMax) : "",
-    currency: application?.currency ?? "USD",
+    companyName: application?.companyName ?? initialValues?.companyName ?? "",
+    roleTitle: application?.roleTitle ?? initialValues?.roleTitle ?? "",
+    jobUrl: application?.jobUrl ?? initialValues?.jobUrl ?? "",
+    location: application?.location ?? initialValues?.location ?? "",
+    status: application?.status ?? (APPLICATION_STATUSES.includes(initialValues?.status as ApplicationStatus) ? (initialValues!.status as ApplicationStatus) : "SAVED"),
+    salaryMin: application?.salaryMin != null ? String(application.salaryMin) : (initialValues?.salaryMin ?? ""),
+    salaryMax: application?.salaryMax != null ? String(application.salaryMax) : (initialValues?.salaryMax ?? ""),
+    currency: application?.currency ?? initialValues?.currency ?? "USD",
     dateApplied: application?.dateApplied
       ? new Date(application.dateApplied).toISOString().slice(0, 10)
-      : "",
-    priority: application?.priority ?? "MEDIUM",
-    source: application?.source ?? "",
+      : (initialValues?.dateApplied ?? ""),
+    priority: application?.priority ?? (PRIORITIES.includes(initialValues?.priority as Priority) ? (initialValues!.priority as Priority) : "MEDIUM"),
+    source: application?.source ?? initialValues?.source ?? "",
   };
 
   return (
