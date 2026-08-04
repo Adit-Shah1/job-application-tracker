@@ -48,8 +48,13 @@ export function ImportFromUrl() {
       // the form stays uncontrolled. The page keys ApplicationForm on these, which
       // remounts it with the new defaultValues.
       const params = new URLSearchParams();
-      if ("url" in body) params.set("url", body.url);
-      params.set("source", "URL import");
+      // Carry the typed URL through even on the paste-text fallback — the ad still
+      // lives at that link, the site just wouldn't let us fetch it.
+      const typedUrl = url.trim();
+      if (typedUrl) {
+        params.set("url", typedUrl);
+        params.set("source", "URL import");
+      }
       if (fields.companyName) params.set("company", fields.companyName);
       if (fields.roleTitle) params.set("role", fields.roleTitle);
       if (fields.location) params.set("location", fields.location);
