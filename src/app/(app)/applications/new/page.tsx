@@ -1,4 +1,5 @@
 import { ApplicationForm } from "@/components/applications/ApplicationForm";
+import { ImportFromUrl } from "@/components/applications/ImportFromUrl";
 
 export const metadata = { title: "New application · Job Tracker" };
 
@@ -8,6 +9,10 @@ type SearchParams = {
   company?: string;
   role?: string;
   source?: string;
+  location?: string;
+  salaryMin?: string;
+  salaryMax?: string;
+  currency?: string;
 };
 
 export default async function NewApplicationPage({
@@ -49,6 +54,10 @@ export default async function NewApplicationPage({
     companyName: inferredCompany,
     roleTitle: inferredRole,
     source: params.source ?? (params.url ? "Bookmarklet" : ""),
+    location: params.location ?? "",
+    salaryMin: params.salaryMin ?? "",
+    salaryMax: params.salaryMax ?? "",
+    ...(params.currency ? { currency: params.currency } : {}),
   };
 
   const hasPrefill = Object.values(initialValues).some((v) => v !== "");
@@ -59,11 +68,17 @@ export default async function NewApplicationPage({
         <h1 className="text-2xl font-semibold tracking-tight">New application</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {hasPrefill
-            ? "Review the pre-filled details from the bookmarklet and save when ready."
-            : "Capture the details now. You can update everything later."}
+            ? "Review the pre-filled details and save when ready."
+            : "Paste a job ad link to auto-fill, or capture the details by hand."}
         </p>
       </div>
-      <ApplicationForm mode="create" initialValues={initialValues} />
+      <ImportFromUrl />
+      {/* Key remounts the uncontrolled form so new defaultValues actually show. */}
+      <ApplicationForm
+        key={JSON.stringify(initialValues)}
+        mode="create"
+        initialValues={initialValues}
+      />
     </div>
   );
 }
