@@ -63,17 +63,23 @@ export function BulkApplicationsWrapper({ children, applicationIds }: BulkApplic
   );
 }
 
+// ponytail: native accent-color + color-scheme (globals.css) instead of a custom
+// checkbox component — indeterminate and focus states come free from the browser.
+const checkboxClass =
+  "size-4 cursor-pointer rounded accent-indigo-600 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/10 dark:accent-indigo-400 dark:focus-visible:ring-zinc-300/20";
+
 export function BulkCheckbox({ id }: { id: string }) {
   const { selectedIds, toggleSelect } = useBulkSelection();
   const checked = selectedIds.has(id);
 
   return (
     <label className="flex cursor-pointer items-center" onClick={(e) => e.stopPropagation()}>
+      <span className="sr-only">Select application</span>
       <input
         type="checkbox"
         checked={checked}
         onChange={() => toggleSelect(id)}
-        className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800"
+        className={checkboxClass}
       />
     </label>
   );
@@ -86,12 +92,13 @@ export function BulkSelectAllCheckbox({ total }: { total: number }) {
 
   return (
     <label className="flex cursor-pointer items-center" onClick={(e) => e.stopPropagation()}>
+      <span className="sr-only">Select all applications</span>
       <input
         type="checkbox"
         checked={allSelected}
         ref={(el) => { if (el) el.indeterminate = someSelected; }}
         onChange={toggleAll}
-        className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800"
+        className={checkboxClass}
       />
     </label>
   );

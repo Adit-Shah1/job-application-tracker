@@ -111,18 +111,18 @@ export function ApplicationsTable({ applications }: { applications: ApplicationR
             className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-zinc-900/[0.04]"
           >
             <CardContent className="space-y-3 p-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <BulkCheckbox id={app.id} />
-              </div>
-              <div>
-                <Link
-                  href={`/applications/${app.id}`}
-                  className="font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
-                >
-                  {app.companyName}
-                </Link>
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {app.roleTitle}
+                <div className="min-w-0">
+                  <Link
+                    href={`/applications/${app.id}`}
+                    className="font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+                  >
+                    {app.companyName}
+                  </Link>
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {app.roleTitle}
+                  </div>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
